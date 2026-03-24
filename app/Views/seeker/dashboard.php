@@ -6,3 +6,4 @@
      <a href="<?php echo SITE_URL; ?>/jobs" class="section-btn btn btn-default">Browse Jobs</a>
 </div></div></section>
 <?php require BASE_PATH . '/app/Views/layouts/footer.php'; ?>
+<h1>Hii King</h1>
