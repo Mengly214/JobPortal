@@ -19,5 +19,4 @@ class Admin_ApplicationAdminController extends Controller {
         redirect('admin/applications');
     }
 }
-
-
+ 
