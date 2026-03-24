@@ -12,7 +12,7 @@ define('DB_CHARSET', 'utf8mb4');
 //  SITE CONFIGURATION
 // ============================================================
 define('SITE_NAME',  'Jobs Agency');
-define('SITE_URL',   'http://localhost:8080/mvc/JobPortal/public');
+define('SITE_URL',   'http://localhost/web_jobportal/JobPortal/');
 define('SITE_EMAIL', 'contact@company.com');
 
 // ============================================================
