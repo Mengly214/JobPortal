@@ -152,5 +152,31 @@ public function importJob(array $d): int|false {
     if (!$s->execute()) return false;
     return $this->conn->insert_id;
 }
+    // 1. Get the total number of active jobs (for math)
+    public function getTotalJobs(): int
+    {
+        $sql = "SELECT COUNT(id) as total FROM jobs WHERE status = 'active'";
+        $result = $this->conn->query($sql);
+        $row = $result->fetch_assoc();
+        return (int)$row['total'];
+    }
 
+    // 2. Get jobs for a specific page using LIMIT and OFFSET
+    public function getPaginatedJobs(int $limit, int $offset): array
+    {
+        // We join employer_profiles to get the company name and logo
+        $sql = "SELECT j.*, ep.company_name, ep.logo 
+                FROM jobs j 
+                LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id 
+                WHERE j.status = 'active' 
+                ORDER BY j.created_at DESC 
+                LIMIT ? OFFSET ?";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }

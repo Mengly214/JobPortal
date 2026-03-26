@@ -2,6 +2,35 @@
 require_once BASE_PATH . '/app/Models/User.php';
 
 class AuthController extends Controller {
+    public function profile()
+    {
+        requireAuth();
+        $userModel = new User();
+        $userId = $_SESSION['user_id'];
+
+        // --- PUT THE CODE HERE (INSIDE THE POST CHECK) ---
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = $_POST; // This gets 'ee', 'eeee', etc. from your form
+
+            // 1. Handle CV Upload
+            if (!empty($_FILES['cv_file']['name'])) {
+                $cvName = time() . '_' . $_FILES['cv_file']['name'];
+                // Move file to your uploads folder
+                move_uploaded_file($_FILES['cv_file']['tmp_name'], "uploads/cvs/" . $cvName);
+                $data['cv_file'] = $cvName;
+            }
+
+            // 2. Update the Database
+            if ($userModel->updateSeekerProfile($userId, $data)) {
+                $_SESSION['success'] = "Profile updated! You are now at 100%.";
+                redirect('seeker/dashboard'); // Send them back to see the 100% bar
+            }
+        }
+
+        // This part just loads the page (GET request)
+        $user = $userModel->findById($userId);
+        $this->view('seeker/profile', ['user' => $user]);
+    }
 
     public function login(): void {
         if (isLoggedIn()) { $this->redirect('dashboard'); return; }

@@ -1052,5 +1052,66 @@ https://templatemo.com/tm-516-known
 
   .list { font-size: 16px; line-height: 1.6; }
   .list li { margin-bottom: 15px;  }
+<<<<<<< HEAD
 
   
+=======
+    /* Dashboard Enhancements */
+    .dash-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f1f1;
+      transition: transform 0.3s ease;
+    }
+  
+    .dash-card:hover {
+      transform: translateY(-5px);
+    }
+  
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 10px;
+      display: block;
+    }
+  
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: #2ecc71;
+      /* Your brand green */
+    }
+  
+    .custom-table thead {
+      background-color: #f8f9fa;
+    }
+  
+    .custom-table th {
+      border-top: none;
+      color: #555;
+      font-weight: 600;
+      padding: 15px;
+    }
+        .table td {
+          padding: 15px 10px !important;
+          vertical-align: middle;
+        }
+    
+        /* Make the button look like a real professional link */
+        .btn-outline-danger {
+          color: #dc3545;
+          border-color: #dc3545;
+          background-color: transparent;
+          transition: all 0.3s;
+        }
+    
+        .btn-outline-danger:hover {
+          background-color: #dc3545;
+          color: white;
+        }
+>>>>>>> 31641f3ae7d94e458be00d9b01410f6a5f38d946

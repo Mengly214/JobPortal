@@ -77,4 +77,36 @@ class Seeker_ProfileController extends Controller {
             'success'    => $success,
         ]);
     }
+    public function update(): void
+    {
+        requireAuth();
+        $userId = (int)$_SESSION['user_id'];
+        $userModel = new User();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'full_name'   => clean($_POST['full_name']),
+                'email'       => clean($_POST['email']),
+                'seeker_city' => clean($_POST['location_city']),
+                'bio'         => clean($_POST['bio']),
+                'skills'      => clean($_POST['skills']),
+                'experience'  => clean($_POST['experience']),
+                'education'   => clean($_POST['education']),
+                'avatar'      => $_POST['old_avatar'],
+                'cv_file'     => $_POST['old_cv']
+            ];
+
+            // Handle CV Upload
+            if (!empty($_FILES['cv_file']['name'])) {
+                $fileName = time() . '_' . $_FILES['cv_file']['name'];
+                move_uploaded_file($_FILES['cv_file']['tmp_name'], "uploads/cvs/$fileName");
+                $data['cv_file'] = $fileName;
+            }
+
+            if ($userModel->updateSeekerProfile($userId, $data)) {
+                $_SESSION['success'] = "Profile updated! Check your dashboard for 100% strength.";
+                redirect('seeker/dashboard');
+            }
+        }
+    }
 }

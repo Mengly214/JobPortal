@@ -2,13 +2,18 @@
 require_once BASE_PATH . '/app/Models/Job.php';
 require_once BASE_PATH . '/app/Models/Application.php';
 
-class ApplicationController extends Controller {
+class ApplicationController extends Controller
+{
 
-    public function store(string $jobId): void {
+    public function store(string $jobId): void
+    {
         $jobId = (int)$jobId;
         $model = new Job();
         $job   = $model->find($jobId);
-        if (!$job) { $this->redirect('jobs'); return; }
+        if (!$job) {
+            $this->redirect('jobs');
+            return;
+        }
 
         $appSuccess = $appError = '';
 
@@ -35,5 +40,21 @@ class ApplicationController extends Controller {
             'appSuccess' => $appSuccess,
             'appError'   => $appError,
         ]);
+    }
+    public function cancel(string $id): void
+    {
+        requireAuth();
+        $applicationId = (int)$id;
+        $userId = (int)$_SESSION['user_id'];
+
+        $appModel = new Application();
+
+        if ($appModel->withdraw($applicationId, $userId)) {
+            $_SESSION['success'] = "Application withdrawn successfully.";
+        } else {
+            $_SESSION['error'] = "Unable to withdraw application.";
+        }
+
+        $this->redirect('seeker/dashboard');
     }
 }

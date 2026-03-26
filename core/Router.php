@@ -57,4 +57,5 @@ class Router {
         $obj = new $className();
         $obj->$action(...$params);
     }
+    
 }

@@ -3,7 +3,8 @@ require_once BASE_PATH . '/app/Models/Job.php';
 
 class JobController extends Controller {
 
-    public function index(): void {
+    public function index(): void
+    {
         $model     = new Job();
         $keyword   = clean($_GET['keyword']   ?? '');
         $location  = clean($_GET['location']  ?? '');
@@ -14,6 +15,7 @@ class JobController extends Controller {
         $page      = max(1, (int)($_GET['page'] ?? 1));
         $offset    = ($page - 1) * $perPage;
 
+        // Make sure your Job model has this search() method!
         $result     = $model->search($keyword, $location, $category, $job_type, $work_mode, $perPage, $offset);
         $totalPages = (int)ceil($result['total'] / $perPage);
 
@@ -24,7 +26,7 @@ class JobController extends Controller {
             'totalRows'   => $result['total'],
             'totalPages'  => $totalPages,
             'currentPage' => $page,
-            'categories'  => $model->getCategories(),
+            'categories'  => $model->getCategories(), // Make sure your Job model has this method!
             'keyword'     => $keyword,
             'location'    => $location,
             'category'    => $category,
@@ -32,7 +34,6 @@ class JobController extends Controller {
             'work_mode'   => $work_mode,
         ]);
     }
-
     public function show(string $id): void {
         $model = new Job();
         $job   = $model->find((int)$id);

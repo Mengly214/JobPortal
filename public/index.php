@@ -1,5 +1,5 @@
 <?php
- 
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // ============================================================
@@ -84,5 +84,8 @@ $router->any('/employer/profile',    'Employer/ProfileController',   'index');
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
-
+// Seeker
+$router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
+$router->get('/seeker/applications', 'Seeker/DashboardController', 'applications'); // Add this line
+$router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
 $router->dispatch();
