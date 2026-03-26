@@ -6,12 +6,14 @@ require_once BASE_PATH . '/app/Models/Testimonial.php';
 class PageController extends Controller {
 
     public function home(): void {
+        $jobModel = new Job();
         $this->view('pages/home', [
             'pageTitle'    => 'Home',
             'activePage'   => 'home',
-            'featuredJobs' => (new Job())->getFeatured(3),
+            'featuredJobs' => $jobModel->getFeatured(6),
             'latestPosts'  => (new Blog())->getLatest(3),
             'testimonials' => (new Testimonial())->getActive(),
+            'categories'   => $jobModel->getCategories(),
         ]);
     }
 
