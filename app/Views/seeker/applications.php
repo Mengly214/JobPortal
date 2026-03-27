@@ -114,7 +114,7 @@
                         };
 
                         // Deadline
-                        $deadlineStr   = $app['deadline'] ?? null;
+                        $deadlineStr   = $app['application_deadline'] ?? null;
                         $deadlineLabel = '';
                         $deadlineClass = '';
                         if ($deadlineStr) {
@@ -138,7 +138,7 @@
                         <!-- Job -->
                         <td>
                             <strong class="job-title"><?= htmlspecialchars($app['job_title']) ?></strong>
-                            <a href="<?= SITE_URL ?>/jobs/view/<?= $app['job_id'] ?? 0 ?>" class="job-link">
+                            <a href="<?= SITE_URL ?>/jobs/<?= $app['job_id'] ?? 0 ?>" class="job-link">
                                 <i class="fa fa-external-link"></i> View job
                             </a>
                         </td>
@@ -182,27 +182,14 @@
 
                         <!-- Actions -->
                         <td>
-                            <?php if (!empty($app['cv_file'])): ?>
-                            <a href="<?= SITE_URL ?>/uploads/cvs/<?= htmlspecialchars($app['cv_file']) ?>"
-                               download class="act-btn">
-                                <i class="fa fa-download"></i> Resume
-                            </a>
-                            <?php endif; ?>
-
-                            <a href="<?= SITE_URL ?>/jobs/view/<?= $app['job_id'] ?? 0 ?>" class="act-btn">
-                                <i class="fa fa-eye"></i> View
-                            </a>
-
-                            <?php if (in_array($status, ['submitted', 'reviewing', 'shortlisted'])): ?>
                             <form action="<?= SITE_URL ?>/applications/cancel/<?= $app['id'] ?>"
                                   method="POST"
                                   onsubmit="return confirm('Are you sure you want to withdraw this application?');"
-                                  style="display:inline;">
+                                  style="display:inline;" >
                                 <button type="submit" class="act-btn act-btn--danger">
                                     <i class="fa fa-times"></i> Withdraw
                                 </button>
                             </form>
-                            <?php endif; ?>
                         </td>
 
                     </tr>
