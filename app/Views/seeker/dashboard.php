@@ -26,13 +26,13 @@
 
      /* 3. The Green Stat Box */
      .stat-box {
-          background: linear-gradient(135deg, #10b981, #059669);
+          background: linear-gradient(135deg, #2470cd, #084fa3);
           /* Richer emerald green */
           color: white;
           border-radius: 12px;
           padding: 30px 20px;
           text-align: center;
-          box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+          box-shadow: 0 10px 15px -3px #364ed74d;
           margin-bottom: 24px;
           display: flex;
           flex-direction: column;
@@ -53,21 +53,21 @@
           letter-spacing: 1.5px;
           margin-top: 8px;
           text-transform: uppercase;
-          opacity: 0.9;
           margin-bottom: 0;
+          color:white;
      }
 
      /* 4. Soft action buttons */
      .btn-soft {
-          background-color: #ecfdf5;
-          color: #059669;
+          background-color: #ecf2fd;
+          color: #084fa3;
           font-weight: 600;
-          border: 1px solid #a7f3d0;
+          border: 1px solid #85b5f0;
           transition: 0.2s;
      }
 
      .btn-soft:hover {
-          background-color: #10b981;
+          background-color: #1360be;
           color: white;
      }
 
@@ -87,7 +87,7 @@
      .card-header-title {
           font-size: 16px;
           font-weight: 700;
-          color: #1e293b;
+          color: #233148;
           margin: 0;
           display: flex;
           align-items: center;
@@ -102,8 +102,8 @@
                <div class="col-12">
                     <div class="premium-card" style="padding: 20px 24px; flex-direction: row; justify-content: space-between; align-items: center; height: auto;">
                          <div class="d-flex align-items-center gap-3">
-                              <div style="width: 56px; height: 56px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                   <i class="fa fa-user text-success" style="font-size: 20px;"></i>
+                              <div style="width: 56px; height: 56px; background: #ecf2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                   <i class="fa fa-user text-success" style="font-size: 20px; color: #1064b9; "></i>
                               </div>
                               <div>
                                    <h3 class="fw-bold mb-1" style="font-size: 20px; color: #0f172a;">Welcome back! 👋</h3>
@@ -138,7 +138,7 @@
                     </div>
 
                     <div class="stat-box">
-                         <h1><?= $data['totalApplied'] ?? 0 ?></h1>
+                         <h1 style="color:white;"><?= $data['totalApplied'] ?? 0 ?></h1>
                          <p>Total Applications</p>
                     </div>
 
@@ -149,7 +149,7 @@
                     <div class="premium-card">
                          <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                               <h6 class="card-header-title"><i class="fa fa-history text-primary"></i> Recent Activity</h6>
-                              <a href="<?= SITE_URL ?>/seeker/applications" class="text-decoration-none" style="font-size: 13px; color: #059669; font-weight: 600;">View All</a>
+                              <a href="<?= SITE_URL ?>/seeker/applications" class="text-decoration-none" style="font-size: 13px; color: #084fa3; font-weight: 600;">View All</a>
                          </div>
 
                          <div class="text-center py-5">
@@ -158,7 +158,7 @@
                               </div>
                               <h6 class="fw-bold text-dark mb-2">Keep exploring!</h6>
                               <p class="text-muted small mb-4">Check out our latest jobs to find your next opportunity.</p>
-                              <a href="<?= SITE_URL ?>/jobs" class="btn btn-success rounded-pill px-4 shadow-sm" style="background: #10b981; border:none;">Browse New Jobs</a>
+                              <a href="<?= SITE_URL ?>/jobs" class="btn btn-success rounded-pill px-4 shadow-sm" style="background: #084fa3; border:none;">Browse New Jobs</a>
                          </div>
                     </div>
 
@@ -182,7 +182,7 @@
                               </div>
                               <div class="flex-grow-1 px-3">
                                    <h6 class="mb-1 fw-bold" style="font-size: 15px; color: #1e293b;">UI/UX Designer</h6>
-                                   <p class="text-muted small mb-0"><i class="fa fa-map-marker me-1"></i> Remote</p>
+                                   <p class="text-muted small mb-0"><i class="fa fa-map-marker me-1" ></i> Remote</p>
                               </div>
                               <a href="<?= SITE_URL ?>/jobs" class="btn btn-sm btn-outline-success rounded-pill px-3" style="font-size: 12px; font-weight: 600;">View</a>
                          </div>

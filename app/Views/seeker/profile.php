@@ -5,17 +5,17 @@
 .profile-sidebar {
      background:#fff; border-radius:8px;
      box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:4px solid #29ca8e;
+     border-top:4px solid #1360be;
      padding:28px 20px; text-align:center;
 }
 .profile-avatar {
      width:100px; height:100px; border-radius:50%;
-     object-fit:cover; border:4px solid #29ca8e; margin-bottom:12px;
+     object-fit:cover; border:4px solid #1360be; margin-bottom:12px;
 }
 .profile-card {
      background:#fff; border-radius:8px;
      box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:3px solid #29ca8e;
+     border-top:3px solid #1360be;
      padding:24px; margin-bottom:20px;
 }
 .profile-card h4 {
