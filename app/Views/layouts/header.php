@@ -51,21 +51,29 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
     .jg-nav__links > li > a:hover,
     .jg-nav__links > li.active > a { color: #0a65cc; background: #f0f5ff; }
 
-    /* ── Dropdown (JS-driven, no :hover) ── */
+    /* ── Dropdown (CSS hover) ── */
     .jg-nav__links .jg-dropdown { position: relative; }
     .jg-nav__links .jg-dropdown-menu {
-        display: none;
-        position: absolute; top: calc(100% + 8px); left: 0;
-        background: #fff; border: 1px solid #e0e6f0; border-radius: 10px;
-        box-shadow: 0 8px 32px rgba(10,101,204,.12); min-width: 180px;
-        padding: 8px 0; z-index: 1000;
-        /* Animate in */
-        opacity: 0; transform: translateY(-6px);
-        transition: opacity .15s ease, transform .15s ease;
-    }
-    .jg-nav__links .jg-dropdown-menu.open {
         display: block;
+        position: absolute; top: 100%; left: 0;
+        background: #fff;
+        border: 1px solid #e0e6f0;
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(10,101,204,.12);
+        min-width: 180px;
+        padding: 8px 0;
+        z-index: 1000;
+        margin-top: 0;
+        /* Invisible top border acts as bridge over the gap */
+        border-top: 8px solid transparent;
+        background-clip: padding-box;
+        opacity: 0; pointer-events: none;
+        transition: opacity .15s ease, transform .15s ease;
+        transform: translateY(-4px);
+    }
+    .jg-nav__links .jg-dropdown:hover .jg-dropdown-menu {
         opacity: 1; transform: translateY(0);
+        pointer-events: auto;
     }
     .jg-nav__links .jg-dropdown-menu li { list-style: none; }
     .jg-nav__links .jg-dropdown-menu li a {
@@ -89,7 +97,7 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
     }
     .jg-nav__btn-signup:hover { background: #084fa3; border-color: #084fa3; }
 
-    /* ── User dropdown (JS-driven) ── */
+    /* ── User dropdown (CSS hover) ── */
     .jg-nav__user { position: relative; cursor: pointer; }
     .jg-nav__user-trigger {
         display: flex; align-items: center; gap: 9px;
@@ -110,17 +118,36 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
         display: flex; align-items: center; justify-content: center;
     }
     .jg-nav__user-menu {
-        display: none;
-        position: absolute; top: calc(100% + 10px); right: 0;
-        background: #fff; border: 1px solid #e0e6f0; border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(10,101,204,.12); min-width: 220px;
-        padding: 8px 0; z-index: 1000;
-        opacity: 0; transform: translateY(-6px);
-        transition: opacity .15s ease, transform .15s ease;
-    }
-    .jg-nav__user-menu.open {
         display: block;
+        position: absolute; top: 100%; right: 0;
+        background: #fff;
+        border: 1px solid #e0e6f0;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(10,101,204,.12);
+        min-width: 220px;
+        padding: 8px 0;
+        z-index: 1000;
+        border-top: 10px solid transparent;
+        background-clip: padding-box;
+        opacity: 0; pointer-events: none;
+        transition: opacity .15s ease, transform .15s ease;
+        transform: translateY(-4px);
+    }
+    .jg-nav__user:hover .jg-nav__user-menu {
         opacity: 1; transform: translateY(0);
+        pointer-events: auto;
+    }
+    /* Visible card */
+    .jg-nav__user-menu::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #fff;
+        border: 1px solid #e0e6f0;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(10,101,204,.12);
+        z-index: -1;
     }
     .jg-nav__user-header { padding: 10px 18px 12px; border-bottom: 1px solid #f0f4f8; }
     .jg-nav__user-header small { display: block; font-size: 12px; color: #aaa; }
@@ -134,6 +161,7 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
     .jg-nav__user-menu .divider { height: 1px; background: #f0f4f8; margin: 6px 0; }
     .jg-nav__user-menu a.logout { color: #e74c3c; }
     .jg-nav__user-menu a.logout:hover { background: #fef2f2; color: #c0392b; }
+    .jg-nav__user-menu a:last-child { margin-bottom: 8px; }
 
     /* Mobile toggle */
     .jg-nav__toggle { display: none; background: none; border: none; cursor: pointer; padding: 6px; }
@@ -150,12 +178,14 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
         }
         .jg-nav__links > li { width: 100%; }
         .jg-nav__links > li > a { padding: 10px 4px; }
-        /* Mobile: dropdown sits inline, always visible when open */
+        /* Mobile: dropdown hidden by default, toggled by JS */
         .jg-nav__links .jg-dropdown-menu {
+            display: none;
             position: static; box-shadow: none; border: none;
             border-left: 2px solid #e0e6f0; margin-left: 16px;
-            opacity: 1; transform: none; /* no slide animation on mobile */
+            opacity: 1; transform: none; pointer-events: auto;
         }
+        .jg-nav__links .jg-dropdown-menu.open { display: block; }
         .jg-nav__actions { flex-direction: row; width: 100%; padding: 10px 0; border-top: 1px solid #f0f4f8; }
     }
     </style>
@@ -252,60 +282,21 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
 
 <script>
 (function () {
-    /* ── Helpers ── */
-    function openMenu(menu, trigger) {
-        menu.classList.add('open');
-        if (trigger) trigger.setAttribute('aria-expanded', 'true');
-    }
-    function closeMenu(menu, trigger) {
-        menu.classList.remove('open');
-        if (trigger) trigger.setAttribute('aria-expanded', 'false');
-    }
-    function toggleMenu(menu, trigger) {
-        menu.classList.contains('open') ? closeMenu(menu, trigger) : openMenu(menu, trigger);
-    }
-
-    /* ── "More" nav dropdown ── */
-    var moreDropdown = document.querySelector('.jg-dropdown');
-    if (moreDropdown) {
-        var moreTrigger = moreDropdown.querySelector('.jg-dropdown-trigger');
-        var moreMenu    = moreDropdown.querySelector('.jg-dropdown-menu');
-
-        moreTrigger.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu(moreMenu, moreTrigger);
-        });
-    }
-
-    /* ── User account dropdown ── */
-    var userWrap    = document.getElementById('jg-user-dropdown');
-    var userTrigger = document.getElementById('jg-user-trigger');
-    var userMenu    = document.getElementById('jg-user-menu');
-
-    if (userWrap && userTrigger && userMenu) {
-        userTrigger.addEventListener('click', function (e) {
-            e.stopPropagation();
-            toggleMenu(userMenu, userTrigger);
-        });
-    }
-
-    /* ── Close all dropdowns when clicking outside ── */
-    document.addEventListener('click', function () {
-        if (moreMenu)   closeMenu(moreMenu,  moreTrigger);
-        if (userMenu)   closeMenu(userMenu,  userTrigger);
-    });
-
-    /* Prevent clicks inside menus from closing them */
-    [moreDropdown, userWrap].forEach(function (el) {
-        if (el) el.addEventListener('click', function (e) { e.stopPropagation(); });
-    });
-
     /* ── Mobile menu toggle ── */
     document.getElementById('jg-toggle').addEventListener('click', function () {
         document.getElementById('jg-links').classList.toggle('open');
         document.getElementById('jg-actions').classList.toggle('open');
     });
+
+    /* ── Mobile: More dropdown click toggle ── */
+    var moreTrigger = document.querySelector('.jg-dropdown-trigger');
+    if (moreTrigger) {
+        moreTrigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            var menu = this.closest('.jg-dropdown').querySelector('.jg-dropdown-menu');
+            if (menu) menu.classList.toggle('open');
+        });
+    }
 
     /* ── Scroll shadow ── */
     window.addEventListener('scroll', function () {
