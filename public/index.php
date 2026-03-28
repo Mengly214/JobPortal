@@ -77,9 +77,14 @@ $router->post('/admin/applications/update',   'Admin/ApplicationAdminController'
 $router->get('/admin/messages',               'Admin/MessageController',      'index');
 $router->any('/admin/settings',               'Admin/SettingsController',     'index');
 
-// Employer
-$router->get('/employer/dashboard',  'Employer/DashboardController', 'index');
-$router->any('/employer/profile',    'Employer/ProfileController',   'index');
+// Employer Dashboard & Profile
+$router->get('/employer/dashboard', 'Employer/DashboardController', 'index');
+$router->any('/employer/profile', 'Employer/ProfileController', 'index');
+
+// Employer Applications
+$router->get('/employer/applications', 'Employer/ApplicationsController', 'index');        // List all applications
+$router->get('/employer/applications/:id', 'Employer/ApplicationsController', 'show');    // View single application
+$router->post('/employer/applications/updateStatus', 'Employer/ApplicationsController', 'updateStatus'); // Update application status
 
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
