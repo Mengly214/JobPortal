@@ -1052,6 +1052,10 @@ https://templatemo.com/tm-516-known
 
   .list { font-size: 16px; line-height: 1.6; }
   .list li { margin-bottom: 15px;  }
+<<<<<<< HEAD
+
+  
+=======
     /* Dashboard Enhancements */
     .dash-card {
       background: #fff;
@@ -1110,3 +1114,4 @@ https://templatemo.com/tm-516-known
           background-color: #dc3545;
           color: white;
         }
+>>>>>>> 31641f3ae7d94e458be00d9b01410f6a5f38d946

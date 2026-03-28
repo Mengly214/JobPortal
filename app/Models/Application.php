@@ -20,7 +20,7 @@ class Application extends Model
     public function getAll(string $status = ''): array
     {
         $w = $status ? "WHERE a.status='$status'" : '';
-        return $this->conn->query("SELECT a.*, j.title AS job_title, u.email AS applicant_email, ep.company_name FROM applications a JOIN jobs j ON a.job_id=j.id JOIN users u ON a.applicant_id=u.id LEFT JOIN employer_profiles ep ON j.employer_id=ep.user_id $w ORDER BY a.applied_at DESC")->fetch_all(MYSQLI_ASSOC);
+        return $this->conn->query("SELECT a.*, j.job_image, j.title AS job_title, j.application_deadline, u.email AS applicant_email, ep.company_name, ep.logo AS company_logo FROM applications a JOIN jobs j ON a.job_id=j.id JOIN users u ON a.applicant_id=u.id LEFT JOIN employer_profiles ep ON j.employer_id=ep.user_id $w ORDER BY a.applied_at DESC")->fetch_all(MYSQLI_ASSOC);
     }
 
     public function updateStatus(int $id, string $status): void
@@ -45,7 +45,12 @@ class Application extends Model
 
     public function recent(int $limit = 8): array
     {
-        return $this->conn->query("SELECT a.*, j.title AS job_title, u.email AS applicant_email FROM applications a JOIN jobs j ON a.job_id=j.id JOIN users u ON a.applicant_id=u.id ORDER BY a.applied_at DESC LIMIT $limit")->fetch_all(MYSQLI_ASSOC);
+        return $this->conn->query("SELECT a.*, j.title AS job_title, j.application_deadline, u.email AS applicant_email, ep.company_name, ep.logo AS company_logo
+        FROM applications a 
+        JOIN jobs j ON a.job_id=j.id 
+        JOIN users u ON a.applicant_id=u.id 
+        LEFT JOIN employer_profiles ep ON j.employer_id=ep.user_id 
+        ORDER BY a.applied_at DESC LIMIT $limit")->fetch_all(MYSQLI_ASSOC);
     }
     // Add these to your Application class
     public function countBySeeker(int $userId): int
@@ -58,11 +63,13 @@ class Application extends Model
 
     public function recentBySeeker(int $userId, int $limit = 5): array
     {
-        $s = $this->conn->prepare("SELECT a.*, j.title AS job_title 
-                               FROM applications a 
-                               JOIN jobs j ON a.job_id = j.id 
-                               WHERE a.applicant_id = ? 
-                               ORDER BY a.applied_at DESC LIMIT ?");
+        $s = $this->conn->prepare("SELECT a.*, j.title AS job_title, j.application_deadline, ep.company_name, ep.logo AS company_logo
+        FROM applications a 
+        JOIN jobs j ON a.job_id = j.id 
+        LEFT JOIN employer_profiles ep ON j.employer_id=ep.user_id
+        WHERE a.applicant_id = ? 
+        ORDER BY a.applied_at DESC 
+        LIMIT ?");
         $s->bind_param('ii', $userId, $limit);
         $s->execute();
         return $s->get_result()->fetch_all(MYSQLI_ASSOC);

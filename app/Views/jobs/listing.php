@@ -1,318 +1,526 @@
 <?php require BASE_PATH . '/app/Views/layouts/header.php'; ?>
 
+<!-- ======================================================
+     PAGE HERO
+====================================================== -->
+<div class="jg-page-hero">
+    <div class="jg-page-hero__photo"></div>
+    <div class="jg-page-hero__overlay"></div>
+    <div class="container jg-page-hero__inner">
+        <div class="jg-breadcrumb">
+            <a href="<?php echo SITE_URL; ?>/">Home</a>
+            <i class="fa fa-angle-right"></i>
+            <span>Jobs</span>
+        </div>
+        <h1 class="jg-page-hero__title">Browse Jobs</h1>
+        <p class="jg-page-hero__sub">
+            Find your perfect role from
+            <strong><?php echo number_format($totalRows); ?></strong> available positions
+        </p>
+    </div>
+</div>
+
+<!-- ======================================================
+     FILTER BAR
+====================================================== -->
+<div class="jg-filterbar-wrap">
+    <div class="container">
+        <form action="<?php echo SITE_URL; ?>/jobs" method="get" class="jg-filterbar">
+            <div class="jg-filterbar__field jg-filterbar__field--grow">
+                <i class="fa fa-search"></i>
+                <input type="text" name="keyword" placeholder="Job title or keyword"
+                       value="<?php echo htmlspecialchars($keyword); ?>">
+            </div>
+            <div class="jg-filterbar__sep"></div>
+            <div class="jg-filterbar__field">
+                <i class="fa fa-map-marker"></i>
+                <input type="text" name="location" placeholder="City or country"
+                       value="<?php echo htmlspecialchars($location); ?>">
+            </div>
+            <div class="jg-filterbar__sep"></div>
+            <div class="jg-filterbar__field jg-filterbar__field--select">
+                <i class="fa fa-th-list"></i>
+                <select name="category">
+                    <option value="">All Categories</option>
+                    <?php foreach ($categories as $cat): ?>
+                    <option value="<?php echo $cat['id']; ?>" <?php echo $category == $cat['id'] ? 'selected' : ''; ?>>
+                        <?php echo clean($cat['name']); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="jg-filterbar__sep"></div>
+            <div class="jg-filterbar__field jg-filterbar__field--select">
+                <i class="fa fa-clock-o"></i>
+                <select name="job_type">
+                    <option value="">All Types</option>
+                    <?php foreach (['full_time'=>'Full Time','part_time'=>'Part Time','contract'=>'Contract','freelance'=>'Freelance','internship'=>'Internship'] as $v=>$l): ?>
+                    <option value="<?php echo $v; ?>" <?php echo $job_type===$v?'selected':''; ?>><?php echo $l; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="jg-filterbar__sep"></div>
+            <div class="jg-filterbar__field jg-filterbar__field--select">
+                <i class="fa fa-laptop"></i>
+                <select name="work_mode">
+                    <option value="">All Modes</option>
+                    <?php foreach (['on_site'=>'On Site','remote'=>'Remote','hybrid'=>'Hybrid'] as $v=>$l): ?>
+                    <option value="<?php echo $v; ?>" <?php echo $work_mode===$v?'selected':''; ?>><?php echo $l; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="jg-filterbar__btn">
+                <i class="fa fa-search"></i> Search
+            </button>
+            <?php if ($keyword || $location || $category || $job_type || $work_mode): ?>
+            <a href="<?php echo SITE_URL; ?>/jobs" class="jg-filterbar__clear" title="Clear filters">
+                <i class="fa fa-times"></i>
+            </a>
+            <?php endif; ?>
+        </form>
+    </div>
+</div>
+
+<!-- ======================================================
+     RESULTS
+====================================================== -->
+<section class="jg-jobs-section">
+    <div class="container">
+
+        <?php if (empty($jobs)): ?>
+        <!-- Empty state -->
+        <div class="jg-empty">
+            <div class="jg-empty__icon"><i class="fa fa-search"></i></div>
+            <h3>No Jobs Found</h3>
+            <p>Try adjusting your search criteria or <a href="<?php echo SITE_URL; ?>/jobs">clear all filters</a>.</p>
+        </div>
+
+        <?php else: ?>
+
+        <div class="jg-results-bar">
+            <p class="jg-results-bar__count">
+                Showing <strong><?php echo count($jobs); ?></strong> of
+                <strong><?php echo number_format($totalRows); ?></strong> jobs
+                <?php if ($currentPage > 1): ?>
+                — Page <strong><?php echo $currentPage; ?></strong> of <strong><?php echo $totalPages; ?></strong>
+                <?php endif; ?>
+            </p>
+            <!-- active filter chips -->
+            <?php if ($keyword || $location || $category || $job_type || $work_mode): ?>
+            <div class="jg-filter-chips">
+                <?php if ($keyword): ?><span class="jg-chip"><?php echo htmlspecialchars($keyword); ?> <a href="?<?php echo http_build_query(array_merge($_GET,['keyword'=>'','page'=>1])); ?>"><i class="fa fa-times"></i></a></span><?php endif; ?>
+                <?php if ($location): ?><span class="jg-chip"><?php echo htmlspecialchars($location); ?> <a href="?<?php echo http_build_query(array_merge($_GET,['location'=>'','page'=>1])); ?>"><i class="fa fa-times"></i></a></span><?php endif; ?>
+                <?php if ($job_type): ?><span class="jg-chip"><?php echo ucfirst(str_replace('_',' ',$job_type)); ?> <a href="?<?php echo http_build_query(array_merge($_GET,['job_type'=>'','page'=>1])); ?>"><i class="fa fa-times"></i></a></span><?php endif; ?>
+                <?php if ($work_mode): ?><span class="jg-chip"><?php echo ucfirst(str_replace('_',' ',$work_mode)); ?> <a href="?<?php echo http_build_query(array_merge($_GET,['work_mode'=>'','page'=>1])); ?>"><i class="fa fa-times"></i></a></span><?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Job Cards -->
+        <div class="jg-job-list">
+            <?php foreach ($jobs as $i => $job): ?>
+            <div class="jg-job-card <?php echo $job['is_featured'] ? 'jg-job-card--featured' : ''; ?> js-reveal"
+                 data-reveal-delay="<?php echo ($i % 5) * 60; ?>">
+                <?php if ($job['is_featured']): ?>
+                <div class="jg-job-card__featured-badge">
+                    <i class="fa fa-star"></i> Featured
+                </div>
+                <?php endif; ?>
+
+                <!-- logo -->
+                <div class="jg-job-card__logo">
+                    <?php if (!empty($job['logo'])): ?>
+                        <img src="<?php echo SITE_URL.'/uploads/logos/'.clean($job['logo']); ?>" alt="">
+                    <?php elseif (!empty($job['job_image'])): ?>
+                        <img src="<?php echo SITE_URL.'/uploads/jobs/'.clean($job['job_image']); ?>" alt="">
+                    <?php else: ?>
+                        <span class="jg-job-card__logo-placeholder">
+                            <?php echo strtoupper(substr($job['company_name'] ?? $job['title'],0,1)); ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+
+                <!-- body -->
+                <div class="jg-job-card__body">
+                    <h4>
+                        <a href="<?php echo SITE_URL; ?>/jobs/<?php echo $job['id']; ?>">
+                            <?php echo clean($job['title']); ?>
+                        </a>
+                    </h4>
+                    <p><?php echo clean(substr(strip_tags($job['description']??''),0,110)); ?>...</p>
+                    <div class="jg-job-card__meta">
+                        <?php if (!empty($job['company_name'])): ?>
+                        <span><i class="fa fa-building-o"></i> <?php echo clean($job['company_name']); ?></span>
+                        <?php endif; ?>
+                        <?php if (!empty($job['salary_min'])): ?>
+                        <span><i class="fa fa-money"></i> $<?php echo number_format($job['salary_min']); ?><?php if ($job['salary_max']): ?>–$<?php echo number_format($job['salary_max']); ?><?php endif; ?></span>
+                        <?php endif; ?>
+                        <span><i class="fa fa-map-marker"></i> <?php echo clean($job['location_city']??'Remote'); ?></span>
+                        <span><i class="fa fa-calendar"></i> <?php echo date('d M Y',strtotime($job['created_at'])); ?></span>
+                    </div>
+                </div>
+
+                <!-- actions -->
+                <div class="jg-job-card__actions">
+                    <a href="<?php echo SITE_URL; ?>/jobs/<?php echo $job['id']; ?>"
+                       class="jg-btn jg-btn--primary jg-btn--sm">Apply</a>
+                    <span class="jg-badge jg-badge--<?php echo strtolower(str_replace(['_',' '],'-',$job['job_type']??'full-time')); ?>">
+                        <?php echo ucfirst(str_replace('_',' ',$job['job_type']??'Full Time')); ?>
+                    </span>
+                    <?php if (!empty($job['work_mode']) && $job['work_mode'] !== 'on_site'): ?>
+                    <span class="jg-badge jg-badge--remote">
+                        <?php echo ucfirst(str_replace('_',' ',$job['work_mode'])); ?>
+                    </span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($totalPages > 1): ?>
+        <div class="jg-pagination">
+            <?php if ($currentPage > 1): ?>
+            <a href="?<?php echo http_build_query(array_merge($_GET,['page'=>$currentPage-1])); ?>"
+               class="jg-page-btn jg-page-btn--arrow">
+                <i class="fa fa-chevron-left"></i>
+            </a>
+            <?php endif; ?>
+
+            <?php for ($p = max(1,$currentPage-2); $p <= min($totalPages,$currentPage+2); $p++): ?>
+            <a href="?<?php echo http_build_query(array_merge($_GET,['page'=>$p])); ?>"
+               class="jg-page-btn <?php echo $p===$currentPage?'active':''; ?>">
+                <?php echo $p; ?>
+            </a>
+            <?php endfor; ?>
+
+            <?php if ($currentPage < $totalPages): ?>
+            <a href="?<?php echo http_build_query(array_merge($_GET,['page'=>$currentPage+1])); ?>"
+               class="jg-page-btn jg-page-btn--arrow">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- ======================================================
+     STYLES
+====================================================== -->
 <style>
-     /* 1. Hero Section */
-     .job-hero {
-          background: linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(30, 58, 138, 0.75)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
-          padding: 80px 0 100px;
-          text-align: center;
-          color: white;
-     }
+/* ─── PAGE HERO (shared pattern) ─────────────────────── */
+.jg-page-hero {
+    position: relative;
+    margin-top: -70px;
+    padding-top: 150px;
+    padding-bottom: 60px;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    align-items: flex-end;
+}
+.jg-page-hero__photo {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600&q=60&fit=crop&crop=top')
+                center center / cover no-repeat;
+    transform: scale(1.03);
+    transition: transform .1s linear;
+}
+.jg-page-hero__overlay {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(135deg, rgba(5,14,30,.90) 0%, rgba(10,60,130,.82) 60%, rgba(5,14,30,.70) 100%);
+}
+.jg-page-hero__inner {
+    position: relative; z-index: 2;
+}
+.jg-breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 14px;
+}
+.jg-breadcrumb a { color: rgba(255,255,255,.65); text-decoration: none; transition: color .2s; }
+.jg-breadcrumb a:hover { color: #fff; }
+.jg-breadcrumb i { font-size: 11px; }
+.jg-breadcrumb span { color: rgba(255,255,255,.85); }
+.jg-page-hero__title {
+    font-size: 40px; font-weight: 800; color: #fff;
+    letter-spacing: -1.5px; margin: 0 0 10px; line-height: 1.1;
+    animation: pgTitleIn .65s .1s cubic-bezier(.22,1,.36,1) both;
+}
+.jg-page-hero__sub {
+    font-size: 16px; color: rgba(255,255,255,.70); margin: 0;
+    animation: pgTitleIn .65s .22s cubic-bezier(.22,1,.36,1) both;
+}
+.jg-page-hero__sub strong { color: #4db8ff; }
+@keyframes pgTitleIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
-     /* 2. Filter Bar */
-     .filter-bar {
-          background: #ffffff;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-          padding: 15px 25px;
-          margin-top: -40px;
-          margin-bottom: 40px;
-          border: 1px solid #f1f5f9;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 15px;
-     }
+/* ─── FILTER BAR ──────────────────────────────────────── */
+.jg-filterbar-wrap {
+    background: #fff;
+    border-bottom: 1px solid #e8edf5;
+    box-shadow: 0 4px 24px rgba(10,50,120,.07);
+    position: sticky; top: 70px; z-index: 800;
+}
+.jg-filterbar {
+    display: flex; align-items: center;
+    flex-wrap: wrap; gap: 0;
+    min-height: 62px;
+    border: 1.5px solid #e0e6f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 14px 0;
+    background: #fff;
+}
+.jg-filterbar__field {
+    display: flex; align-items: center;
+    flex: 0 0 auto; padding: 0 18px;
+    min-height: 62px;
+}
+.jg-filterbar__field--grow { flex: 1 1 180px; }
+.jg-filterbar__field i {
+    color: #0a65cc; font-size: 15px; margin-right: 10px; flex-shrink: 0;
+}
+.jg-filterbar__field input,
+.jg-filterbar__field select {
+    border: none; outline: none; background: transparent;
+    font-size: 14px; color: #333; width: 100%;
+    -webkit-appearance: none; appearance: none;
+    cursor: pointer;
+}
+.jg-filterbar__field input::placeholder { color: #aaa; }
+.jg-filterbar__field--select { min-width: 150px; }
+.jg-filterbar__sep {
+    width: 1px; align-self: stretch;
+    background: #e8edf5; margin: 10px 0; flex-shrink: 0;
+}
+.jg-filterbar__btn {
+    background: linear-gradient(135deg, #0a65cc, #0853aa);
+    color: #fff; border: none; font-size: 14px; font-weight: 700;
+    padding: 0 28px; min-height: 62px; cursor: pointer;
+    white-space: nowrap; transition: .2s;
+    display: flex; align-items: center; gap: 8px;
+    border-radius: 0 10px 10px 0;
+}
+.jg-filterbar__btn:hover { background: linear-gradient(135deg, #084fa3, #063d82); }
+.jg-filterbar__clear {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 8px; margin: 0 8px;
+    color: #aaa; font-size: 14px; text-decoration: none;
+    border: 1.5px solid #e8edf5; transition: .2s; flex-shrink: 0;
+}
+.jg-filterbar__clear:hover { border-color: #e74c3c; color: #e74c3c; background: #fef2f2; }
 
-     .stat-badge {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          padding: 6px 14px;
-          border-radius: 20px;
-          font-size: 13px;
-          font-weight: 600;
-          color: #475569;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-     }
+/* ─── JOBS SECTION ────────────────────────────────────── */
+.jg-jobs-section { padding: 36px 0 70px; background: #f5f7fb; min-height: 400px; }
 
-     .dot-gray {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #94a3b8;
-     }
+/* ─── RESULTS BAR ─────────────────────────────────────── */
+.jg-results-bar {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 12px; margin-bottom: 22px;
+}
+.jg-results-bar__count { font-size: 14px; color: #666; margin: 0; flex-shrink: 0; }
+.jg-results-bar__count strong { color: #1a1a2e; }
 
-     .dot-green {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #10b981;
-     }
+/* filter chips */
+.jg-filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.jg-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #e8f0fe; color: #0a65cc; font-size: 12px; font-weight: 600;
+    padding: 4px 12px; border-radius: 20px;
+    border: 1px solid #c7d9f9;
+}
+.jg-chip a { color: #0a65cc; text-decoration: none; opacity: .6; transition: opacity .15s; }
+.jg-chip a:hover { opacity: 1; }
 
-     /* 3. Job Card */
-     .job-card {
-          background: #ffffff;
-          border-radius: 12px;
-          border: 1px solid #f1f5f9;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          overflow: hidden;
-     }
+/* ─── JOB CARDS ───────────────────────────────────────── */
+.jg-job-list { display: flex; flex-direction: column; gap: 14px; }
 
-     .job-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-     }
+.jg-job-card {
+    background: #fff;
+    border: 1.5px solid #e8edf5;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+    position: relative;
+    overflow: hidden;
+}
+.jg-job-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: transparent; border-radius: 14px 0 0 14px;
+    transition: background .2s;
+}
+.jg-job-card:hover {
+    border-color: #bdd0f5;
+    box-shadow: 0 6px 28px rgba(10,101,204,.10);
+    transform: translateY(-2px);
+}
+.jg-job-card:hover::before { background: #0a65cc; }
 
-     .job-card-header {
-          padding: 25px 20px 15px;
-          display: flex;
-          gap: 15px;
-          border-bottom: 1px solid #f8fafc;
-     }
+.jg-job-card--featured {
+    border-color: #c7d9f9;
+    background: linear-gradient(to right, #f7faff, #fff);
+  
 
-     .company-logo-mini {
-          width: 60px;
-          height: 60px;
-          border-radius: 8px;
-          border: 1px solid #f1f5f9;
-          object-fit: contain;
-          padding: 5px;
-          background: #fff;
-     }
+}
+.jg-job-card--featured::before { background: #0a65cc; }
 
-     .job-title {
-          font-size: 18px;
-          font-weight: 700;
-          color: #1e293b;
-          margin-bottom: 4px;
-          line-height: 1.2;
-     }
+.jg-job-card__featured-badge {
+    position: absolute; top: 14px; right: 18px;
+    background: linear-gradient(135deg, #0a65cc, #14a077);
+    color: #fff; font-size: 11px; font-weight: 700;
+    letter-spacing: .5px; padding: 3px 10px; border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+    margin-right: 100px;
+    margin-top: 15px;
+}
 
-     .company-name {
-          font-size: 13px;
-          color: #64748b;
-          font-weight: 600;
-     }
+/* logo */
+.jg-job-card__logo {
+    width: 60px; height: 60px; flex-shrink: 0;
+    border-radius: 12px; overflow: hidden;
+    border: 1.5px solid #e8edf5;
+    display: flex; align-items: center; justify-content: center;
+    background: #f8fafd;
+}
+.jg-job-card__logo img { width: 100%; height: 100%; object-fit: cover; }
+.jg-job-card__logo-placeholder {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, #0a65cc, #14a077);
+}
 
-     .job-body {
-          padding: 15px 20px;
-          flex-grow: 1;
-     }
+/* body */
+.jg-job-card__body { flex: 1; min-width: 0; }
+.jg-job-card__body h4 { font-size: 16px; font-weight: 700; margin: 0 0 5px; }
+.jg-job-card__body h4 a { color: #1a1a2e; text-decoration: none; transition: color .2s; }
+.jg-job-card__body h4 a:hover { color: #0a65cc; }
+.jg-job-card__body > p { font-size: 13px; color: #888; margin: 0 0 10px; line-height: 1.55; }
+.jg-job-card__meta {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    font-size: 13px; color: #666;
+}
+.jg-job-card__meta span { display: flex; align-items: center; gap: 5px; }
+.jg-job-card__meta i { color: #0a65cc; font-size: 12px; }
 
-     .job-meta {
-          font-size: 13px;
-          color: #94a3b8;
-          margin-bottom: 15px;
-          display: flex;
-          gap: 15px;
-          flex-wrap: wrap;
-     }
+/* actions */
+.jg-job-card__actions {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 8px; flex-shrink: 0;
+}
 
-     .job-meta i {
-          color: #cbd5e1;
-          margin-right: 4px;
-     }
+/* ─── BADGES ──────────────────────────────────────────── */
+.jg-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+}
+.jg-badge--full-time   { background:#e8f4fd; color:#0a65cc; }
+.jg-badge--part-time   { background:#fef3e2; color:#d68910; }
+.jg-badge--contract    { background:#fdebd0; color:#ca6f1e; }
+.jg-badge--freelance   { background:#e8f8f5; color:#148a68; }
+.jg-badge--internship  { background:#f4ecf7; color:#7d3c98; }
+.jg-badge--remote      { background:#e8f8f5; color:#148a68; }
+.jg-badge--hybrid      { background:#eaf2fb; color:#2471a3; }
 
-     .job-desc {
-          font-size: 14px;
-          color: #64748b;
-          line-height: 1.6;
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-     }
+/* ─── BUTTONS ─────────────────────────────────────────── */
+.jg-btn { display:inline-flex; align-items:center; gap:7px; font-weight:700; text-decoration:none; border-radius:8px; border:none; cursor:pointer; transition:.2s; }
+.jg-btn--primary { background:#0a65cc; color:#fff; padding:10px 22px; font-size:14px; }
+.jg-btn--primary:hover { background:#084fa3; color:#fff; }
+.jg-btn--outline { background:transparent; color:#0a65cc; padding:9px 20px; font-size:14px; border:2px solid #0a65cc; }
+.jg-btn--outline:hover { background:#0a65cc; color:#fff; }
+.jg-btn--sm { padding:7px 16px; font-size:13px; }
 
-     .job-footer {
-          padding: 15px 20px;
-          border-top: 1px solid #f1f5f9;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: #fafaf9;
-     }
+/* ─── EMPTY STATE ─────────────────────────────────────── */
+.jg-empty {
+    text-align: center; padding: 80px 20px;
+    background: #fff; border-radius: 16px;
+    border: 1.5px dashed #d0daea;
+}
+.jg-empty__icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #f0f5ff; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #0a65cc;
+}
+.jg-empty h3 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+.jg-empty p  { color: #888; font-size: 15px; }
+.jg-empty a  { color: #0a65cc; font-weight: 600; }
 
-     .job-type-badge {
-          background: #eef2ff;
-          color: #4f46e5;
-          font-size: 12px;
-          font-weight: 600;
-          padding: 6px 12px;
-          border-radius: 6px;
-     }
+/* ─── PAGINATION ──────────────────────────────────────── */
+.jg-pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 44px; flex-wrap: wrap;
+}
+.jg-page-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: #555;
+    background: #fff; border: 1.5px solid #e8edf5;
+    text-decoration: none; transition: .2s;
+}
+.jg-page-btn:hover       { border-color: #0a65cc; color: #0a65cc; background: #f0f5ff; }
+.jg-page-btn.active      { background: #0a65cc; color: #fff; border-color: #0a65cc; }
+.jg-page-btn--arrow      { color: #888; }
 
-     .view-job-btn {
-          background: #0f172a;
-          color: white;
-          font-size: 13px;
-          font-weight: 600;
-          padding: 8px 20px;
-          border-radius: 20px;
-          text-decoration: none;
-          transition: 0.2s;
-     }
+/* ─── REVEAL ANIMATION ────────────────────────────────── */
+.js-reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);
+}
+.js-reveal.visible { opacity: 1; transform: translateY(0); }
 
-     .view-job-btn:hover {
-          background: #3b82f6;
-          color: white;
-          text-decoration: none;
-     }
-
-     /* 4. Page Wrapper & Pagination */
-     .jobs-page-wrapper {
-          background-color: #f8fafc;
-          padding-bottom: 80px;
-          /* Big space before the footer */
-     }
-
-     .custom-pagination {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          margin-top: 60px;
-          margin-bottom: 80px;
-     }
-
-     .custom-pagination a {
-          padding: 8px 20px;
-          border: 1px solid #e2e8f0;
-          background: #ffffff;
-          color: #64748b;
-          border-radius: 8px;
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 600;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-          transition: all 0.2s ease;
-     }
-
-     .custom-pagination a:hover {
-          background: #f1f5f9;
-          color: #0f172a;
-          transform: translateY(-1px);
-     }
-
-     .custom-pagination a.active {
-          background: #0f172a;
-          color: white;
-          border-color: #0f172a;
-          box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
-     }
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 991px) {
+    .jg-filterbar { border-radius: 10px; }
+    .jg-filterbar__field--select { min-width: 120px; }
+}
+@media (max-width: 767px) {
+    .jg-page-hero { padding-top: 120px; padding-bottom: 40px; }
+    .jg-page-hero__title { font-size: 28px; }
+    .jg-filterbar { flex-direction: column; border-radius: 10px; }
+    .jg-filterbar__field { width: 100%; min-height: 50px; padding: 0 16px; border-bottom: 1px solid #e8edf5; }
+    .jg-filterbar__sep { display: none; }
+    .jg-filterbar__btn { width: 100%; justify-content: center; border-radius: 0 0 8px 8px; }
+    .jg-filterbar__clear { margin: 8px auto; }
+    .jg-job-card { flex-wrap: wrap; padding: 16px; }
+    .jg-job-card__actions { flex-direction: row; width: 100%; justify-content: flex-start; }
+    .jg-job-card__featured-badge { top: 10px; right: 12px; }
+    .jg-filterbar-wrap { position: static; }
+}
 </style>
 
-<div class="job-hero">
-     <div class="container">
-          <p class="text-uppercase fw-bold mb-2" style="letter-spacing: 2px; font-size: 12px; color: #94a3b8;">Careers</p>
-          <h1 class="fw-bold mb-3">Browse Latest Jobs</h1>
-          <p style="color: #cbd5e1; font-size: 16px;">Find your dream job from top employers hiring right now.</p>
-     </div>
-</div>
+<script>
+(function(){
+    /* Reveal on scroll */
+    var els = document.querySelectorAll('.js-reveal');
+    if ('IntersectionObserver' in window) {
+        var obs = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+                if (e.isIntersecting) {
+                    var el = e.target;
+                    setTimeout(function(){ el.classList.add('visible'); }, parseInt(el.dataset.revealDelay||0));
+                    obs.unobserve(el);
+                }
+            });
+        }, { threshold: 0.08 });
+        els.forEach(function(el){ obs.observe(el); });
+    } else {
+        els.forEach(function(el){ el.classList.add('visible'); });
+    }
 
-<div class="jobs-page-wrapper">
-     <div class="container pb-5">
-
-          <div class="filter-bar">
-               <div class="d-flex gap-3">
-                    <div class="stat-badge"><span class="dot-gray"></span> All Jobs: <?= $data['totalRows'] ?? 0 ?></div>
-               </div>
-
-               <form action="<?= SITE_URL ?>/jobs" method="GET" class="d-flex align-items-center gap-2">
-                    <input type="text" name="keyword" class="form-control form-control-sm border-0 bg-light"
-                         placeholder="Search job title or keyword..."
-                         value="<?= htmlspecialchars($data['keyword'] ?? '') ?>"
-                         style="border-radius: 20px; padding: 8px 15px; width: 250px;">
-
-                    <button type="submit" class="btn btn-sm btn-dark" style="border-radius: 20px; padding: 6px 20px;">Search</button>
-                    <a href="<?= SITE_URL ?>/jobs" class="btn btn-sm btn-light border" style="border-radius: 20px; padding: 6px 15px;">Clear</a>
-               </form>
-          </div>
-
-          <div class="row g-4">
-               <?php if (!empty($data['jobs'])): ?>
-                    <?php foreach ($data['jobs'] as $job): ?>
-                         <div class="col-md-4">
-                              <div class="job-card">
-
-                                   <div class="job-card-header">
-                                        <?php
-                                        // Check if employer has a logo, otherwise use UI Avatars
-                                        $logoUrl = !empty($job['logo'])
-                                             ? SITE_URL . '/uploads/logos/' . clean($job['logo'])
-                                             : 'https://ui-avatars.com/api/?name=' . urlencode($job['company_name'] ?? 'Company') . '&background=0f172a&color=fff&size=120';
-                                        ?>
-                                        <img src="<?= $logoUrl ?>" alt="Logo" class="company-logo-mini">
-                                        <div>
-                                             <h3 class="job-title"><?= htmlspecialchars($job['title']) ?></h3>
-                                             <div class="company-name"><?= htmlspecialchars($job['company_name'] ?? 'Unknown Company') ?></div>
-                                        </div>
-                                   </div>
-
-                                   <div class="job-body">
-                                        <div class="job-meta">
-                                             <span><i class="fa fa-map-marker"></i> <?= htmlspecialchars($job['location_city'] ?? $job['location'] ?? 'Remote') ?></span>
-                                             <span><i class="fa fa-money"></i> <?= htmlspecialchars($job['salary_range'] ?? $job['salary'] ?? 'Negotiable') ?></span>
-                                        </div>
-                                        <p class="job-desc"><?= htmlspecialchars(strip_tags($job['description'])) ?></p>
-                                   </div>
-
-                                   <div class="job-footer">
-                                        <span class="job-type-badge">
-                                             <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $job['job_type'] ?? 'Full-Time'))) ?>
-                                        </span>
-                                        <a href="<?= SITE_URL ?>/jobs/view/<?= $job['id'] ?>" class="view-job-btn">View Details</a>
-                                   </div>
-
-                              </div>
-                         </div>
-                    <?php endforeach; ?>
-               <?php else: ?>
-                    <div class="col-12 text-center py-5">
-                         <div class="p-5 bg-white rounded-3 border">
-                              <i class="fa fa-search text-muted mb-3" style="font-size: 40px;"></i>
-                              <h4 class="fw-bold">No jobs found</h4>
-                              <p class="text-muted">Try adjusting your search keywords or clearing the filters.</p>
-                              <a href="<?= SITE_URL ?>/jobs" class="btn btn-outline-primary rounded-pill mt-2">View All Jobs</a>
-                         </div>
-                    </div>
-               <?php endif; ?>
-          </div>
-
-          <?php
-          if (isset($data['totalPages']) && $data['totalPages'] > 1):
-               // Helper function to keep search queries in the URL when changing pages
-               $queryParams = $_GET;
-               function getPageUrl($page, $params)
-               {
-                    $params['page'] = $page;
-                    return '?' . http_build_query($params);
-               }
-               $currentPage = $data['currentPage'];
-          ?>
-               <div class="custom-pagination">
-                    <?php if ($currentPage > 1): ?>
-                         <a href="<?= getPageUrl($currentPage - 1, $queryParams) ?>"><i class="fa fa-angle-left me-1"></i> Prev</a>
-                    <?php endif; ?>
-
-                    <?php for ($i = 1; $i <= $data['totalPages']; $i++): ?>
-                         <a href="<?= getPageUrl($i, $queryParams) ?>" class="<?= ($i == $currentPage) ? 'active' : '' ?>">
-                              <?= $i ?>
-                         </a>
-                    <?php endfor; ?>
-
-                    <?php if ($currentPage < $data['totalPages']): ?>
-                         <a href="<?= getPageUrl($currentPage + 1, $queryParams) ?>">Next <i class="fa fa-angle-right ms-1"></i></a>
-                    <?php endif; ?>
-               </div>
-          <?php endif; ?>
-
-     </div>
-</div>
+    /* Parallax on page hero photo */
+    var ph = document.querySelector('.jg-page-hero__photo');
+    if (ph) {
+        window.addEventListener('scroll', function(){
+            ph.style.transform = 'scale(1.03) translateY(' + (window.scrollY * .06) + 'px)';
+        }, { passive: true });
+    }
+})();
+</script>
 
 <?php require BASE_PATH . '/app/Views/layouts/footer.php'; ?>

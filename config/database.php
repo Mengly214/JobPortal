@@ -19,7 +19,7 @@ $base       = rtrim($base, '/');
 
 define('SITE_URL', $protocol . '://' . $host . $base . '/public');
 
-define('JSEARCH_API_KEY', '');        // your API key
+define('JSEARCH_API_KEY',  'c3750ffd41msh456db7fb5e4641cp193aebjsn28311744d84f');        // your API key
 
 define('ROOT_PATH',  dirname(__DIR__));
 define('APP_PATH',   ROOT_PATH . '/app');

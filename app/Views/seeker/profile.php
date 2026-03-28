@@ -5,17 +5,17 @@
 .profile-sidebar {
      background:#fff; border-radius:8px;
      box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:4px solid #29ca8e;
+     border-top:4px solid #1b6bcc;
      padding:28px 20px; text-align:center;
 }
 .profile-avatar {
      width:100px; height:100px; border-radius:50%;
-     object-fit:cover; border:4px solid #29ca8e; margin-bottom:12px;
+     object-fit:cover; border:4px solid #1b6bcc; margin-bottom:12px;
 }
 .profile-card {
      background:#fff; border-radius:8px;
      box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:3px solid #29ca8e;
+     border-top:3px solid #1b6bcc;
      padding:24px; margin-bottom:20px;
 }
 .profile-card h4 {
@@ -24,7 +24,7 @@
      margin:0 0 18px; padding-bottom:10px;
      border-bottom:1px solid #f5f5f5;
 }
-.profile-card h4 .fa { color:#29ca8e; margin-right:7px; }
+.profile-card h4 .fa { color:#1360be; margin-right:7px; }
 .profile-label {
      font-size:11px; font-weight:700; text-transform:uppercase;
      letter-spacing:.5px; color:#757575; margin-bottom:5px;
@@ -36,17 +36,17 @@
      transition:border-color .2s !important; box-shadow:none !important;
      height:auto !important;
 }
-.profile-input:focus { border-color:#29ca8e !important; box-shadow:0 0 0 3px rgba(41,202,142,.1) !important; }
+.profile-input:focus { border-color: #29ca8e !important; box-shadow:0 0 0 3px rgba(41,202,142,.1) !important; }
 .profile-textarea { resize:vertical; min-height:90px; }
 .upload-zone {
      border:2px dashed #e0e0e0; border-radius:6px; padding:14px;
      text-align:center; cursor:pointer; transition:.2s;
      position:relative; background:#fafafa;
 }
-.upload-zone:hover { border-color:#29ca8e; background:#f0fdf8; }
+.upload-zone:hover { border-color: #29ca8e; background:#f0fdf8; }
 .upload-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
 .profile-save-btn {
-     background:linear-gradient(135deg,#22a876,#29ca8e);
+     background: linear-gradient( 135deg, #1e69c6, #1b6bcc);
      border:none; color:#fff; font-family:'Muli',sans-serif;
      font-weight:700; font-size:14px; padding:11px 28px;
      border-radius:6px; cursor:pointer; transition:opacity .2s;
@@ -58,10 +58,10 @@
      margin-bottom:4px; transition:.2s;
 }
 .profile-nav a:hover, .profile-nav a.active {
-     background:#f0fdf8; color:#29ca8e; font-weight:700;
+     background: #ecf2fd; color:#1360be; font-weight:700;
 }
 .profile-nav a .fa { width:18px; color:#aaa; margin-right:6px; }
-.profile-nav a.active .fa, .profile-nav a:hover .fa { color:#29ca8e; }
+.profile-nav a.active .fa, .profile-nav a:hover .fa { color:#1360be; }
 .alert-success { background:#eafaf4; border-left:4px solid #29ca8e; color:#1a7a4a; padding:12px 16px; border-radius:6px; margin-bottom:18px; }
 .alert-danger  { background:#fdf2f2; border-left:4px solid #e53935; color:#a94442; padding:12px 16px; border-radius:6px; margin-bottom:18px; }
 </style>
@@ -75,13 +75,13 @@
           <div class="profile-sidebar">
                <?php $src = !empty($user['avatar'])
                     ? SITE_URL.'/uploads/avatars/'.clean($user['avatar'])
-                    : 'https://ui-avatars.com/api/?name='.urlencode($user['full_name'] ?? $user['email']).'&size=120&background=29ca8e&color=fff&bold=true'; ?>
+                    : 'https://ui-avatars.com/api/?name='.urlencode($user['full_name'] ?? $user['email']).'&size=120&background=1360be&color=fff&bold=true'; ?>
                <img id="av-preview" src="<?php echo $src; ?>" class="profile-avatar">
                <div style="font-weight:700;font-size:15px;color:#252525"><?php echo htmlspecialchars($user['full_name'] ?? 'Job Seeker'); ?></div>
                <div style="font-size:12px;color:#aaa;margin:4px 0 10px"><?php echo htmlspecialchars($user['email']); ?></div>
-               <span style="background:#eafaf4;color:#29ca8e;border-radius:50px;padding:3px 12px;font-size:11px;font-weight:700">Job Seeker</span>
+               <span style="background:#eafaf4;color:#1360be;border-radius:50px;padding:3px 12px;font-size:11px;font-weight:700">Job Seeker</span>
                <?php if (!empty($user['seeker_city'])): ?>
-               <div style="font-size:12px;color:#aaa;margin-top:8px"><i class="fa fa-map-marker" style="color:#29ca8e"></i> <?php echo clean($user['seeker_city']); ?></div>
+               <div style="font-size:12px;color:#aaa;margin-top:8px"><i class="fa fa-map-marker" style="color:#1360be"></i> <?php echo clean($user['seeker_city']); ?></div>
                <?php endif; ?>
                <hr style="margin:16px 0">
                <nav class="profile-nav" style="text-align:left">

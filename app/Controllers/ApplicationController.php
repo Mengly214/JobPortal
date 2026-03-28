@@ -55,6 +55,7 @@ class ApplicationController extends Controller
             $_SESSION['error'] = "Unable to withdraw application.";
         }
 
-        $this->redirect('seeker/dashboard');
+        $this->redirect('seeker/dashboard/applications');
     }
+
 }

@@ -89,3 +89,5 @@ $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
 $router->get('/seeker/applications', 'Seeker/DashboardController', 'applications'); // Add this line
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
 $router->dispatch();
+
+
