@@ -84,6 +84,7 @@ $router->any('/employer/profile',    'Employer/ProfileController',   'index');
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
+$router->post('/seeker/withdraw', 'Seeker/DashboardController', 'withdraw');
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
 $router->get('/seeker/applications', 'Seeker/DashboardController', 'applications'); // Add this line

@@ -74,12 +74,16 @@ class Application extends Model
         $s->execute();
         return $s->get_result()->fetch_all(MYSQLI_ASSOC);
     }
-    public function withdraw(int $applicationId, int $userId): bool
+    // Add this inside your Application model class
+    public function withdraw(int $applicationId, int $seekerId): bool
     {
-        // We check both ID and applicant_id for security
-        $s = $this->conn->prepare("UPDATE applications SET status='withdrawn' WHERE id=? AND applicant_id=?");
-        $s->bind_param('ii', $applicationId, $userId);
-        return $s->execute();
+        // We changed 'seeker_id' to 'applicant_id' right here!
+        $sql = "DELETE FROM applications WHERE id = ? AND applicant_id = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $applicationId, $seekerId);
+
+        return $stmt->execute();
     }
     
 }

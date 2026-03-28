@@ -41,21 +41,30 @@ class ApplicationController extends Controller
             'appError'   => $appError,
         ]);
     }
-    public function cancel(string $id): void
+  
+    // Add this inside your Controller
+    public function withdraw(): void
     {
-        requireAuth();
-        $applicationId = (int)$id;
-        $userId = (int)$_SESSION['user_id'];
+        // 1. Make sure it's a POST request
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        $appModel = new Application();
+            // 2. Get the IDs
+            $applicationId = (int)$_POST['application_id'];
+            $seekerId = $_SESSION['user_id']; // Assuming you store the logged-in user ID here
 
-        if ($appModel->withdraw($applicationId, $userId)) {
-            $_SESSION['success'] = "Application withdrawn successfully.";
-        } else {
-            $_SESSION['error'] = "Unable to withdraw application.";
+            // 3. Run the deletion
+            $appModel = new Application(); // Or whatever your model is named
+            $success = $appModel->withdraw($applicationId, $seekerId);
+
+            // 4. Set a success or error message (if you are using flash messages)
+            if ($success) {
+                // Application withdrawn!
+            }
         }
 
-        $this->redirect('seeker/dashboard/applications');
+        // 5. Send them right back to the applications page
+        header("Location: " . SITE_URL . "/seeker/applications");
+        exit;
     }
 
 }

@@ -43,4 +43,26 @@ class Seeker_DashboardController extends Controller
         // LOAD THE SPECIFIC VIEW YOU SHARED EARLIER
         $this->view('seeker/applications', $data);
     }
+    public function withdraw(): void
+    {
+        // 1. Check if it is a secure POST request
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['application_id'])) {
+
+            $applicationId = (int)$_POST['application_id'];
+
+            // Make sure you use whatever session variable stores your logged-in user's ID!
+            $seekerId = $_SESSION['user_id'] ?? 0;
+
+            // 2. Load the Application model (make sure the path matches your structure)
+            require_once BASE_PATH . '/app/Models/Application.php';
+            $appModel = new Application();
+
+            // 3. Delete the application
+            $appModel->withdraw($applicationId, $seekerId);
+        }
+
+        // 4. Redirect the user back to the applications dashboard
+        header("Location: " . SITE_URL . "/seeker/applications");
+        exit;
+    }
 }
