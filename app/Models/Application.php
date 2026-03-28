@@ -61,7 +61,7 @@ class Application extends Model
         return (int)$s->get_result()->fetch_assoc()['c'];
     }
 
-    public function recentBySeeker(int $userId, int $limit = 5): array
+    public function recentBySeeker(int $userId, int $limit = 3): array
     {
         $s = $this->conn->prepare("SELECT a.*, j.title AS job_title, j.application_deadline, ep.company_name, ep.logo AS company_logo
         FROM applications a 

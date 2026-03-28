@@ -1,69 +1,7 @@
 <?php require BASE_PATH . '/app/Views/layouts/header.php'; ?>
 
 <style>
-.profile-page { background:#f5f7fb; min-height:100vh; padding:40px 0 60px; }
-.profile-sidebar {
-     background:#fff; border-radius:8px;
-     box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:4px solid #1b6bcc;
-     padding:28px 20px; text-align:center;
-}
-.profile-avatar {
-     width:100px; height:100px; border-radius:50%;
-     object-fit:cover; border:4px solid #1b6bcc; margin-bottom:12px;
-}
-.profile-card {
-     background:#fff; border-radius:8px;
-     box-shadow:0 2px 15px rgba(0,0,0,.07);
-     border-top:3px solid #1b6bcc;
-     padding:24px; margin-bottom:20px;
-}
-.profile-card h4 {
-     font-family:'Muli',sans-serif; font-weight:700;
-     font-size:14px; color:#252525;
-     margin:0 0 18px; padding-bottom:10px;
-     border-bottom:1px solid #f5f5f5;
-}
-.profile-card h4 .fa { color:#1360be; margin-right:7px; }
-.profile-label {
-     font-size:11px; font-weight:700; text-transform:uppercase;
-     letter-spacing:.5px; color:#757575; margin-bottom:5px;
-     font-family:'Muli',sans-serif;
-}
-.profile-input {
-     border:1.5px solid #e8e8e8 !important; border-radius:6px !important;
-     padding:10px 14px !important; font-size:13px !important;
-     transition:border-color .2s !important; box-shadow:none !important;
-     height:auto !important;
-}
-.profile-input:focus { border-color: #29ca8e !important; box-shadow:0 0 0 3px rgba(41,202,142,.1) !important; }
-.profile-textarea { resize:vertical; min-height:90px; }
-.upload-zone {
-     border:2px dashed #e0e0e0; border-radius:6px; padding:14px;
-     text-align:center; cursor:pointer; transition:.2s;
-     position:relative; background:#fafafa;
-}
-.upload-zone:hover { border-color: #29ca8e; background:#f0fdf8; }
-.upload-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
-.profile-save-btn {
-     background: linear-gradient( 135deg, #1e69c6, #1b6bcc);
-     border:none; color:#fff; font-family:'Muli',sans-serif;
-     font-weight:700; font-size:14px; padding:11px 28px;
-     border-radius:6px; cursor:pointer; transition:opacity .2s;
-}
-.profile-save-btn:hover { opacity:.9; }
-.profile-nav a {
-     display:block; padding:10px 14px; border-radius:6px;
-     color:#575757; text-decoration:none; font-size:13px;
-     margin-bottom:4px; transition:.2s;
-}
-.profile-nav a:hover, .profile-nav a.active {
-     background: #ecf2fd; color:#1360be; font-weight:700;
-}
-.profile-nav a .fa { width:18px; color:#aaa; margin-right:6px; }
-.profile-nav a.active .fa, .profile-nav a:hover .fa { color:#1360be; }
-.alert-success { background:#eafaf4; border-left:4px solid #29ca8e; color:#1a7a4a; padding:12px 16px; border-radius:6px; margin-bottom:18px; }
-.alert-danger  { background:#fdf2f2; border-left:4px solid #e53935; color:#a94442; padding:12px 16px; border-radius:6px; margin-bottom:18px; }
+
 </style>
 
 <section class="profile-page">

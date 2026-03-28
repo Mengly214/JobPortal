@@ -179,4 +179,37 @@ public function importJob(array $d): int|false {
 
         return $result->fetch_all(MYSQLI_ASSOC);
     }
+    public function getRecommendedJobs(int $limit = 3): array
+    {
+        // First try featured jobs
+        $s = $this->conn->prepare("
+            SELECT j.*, ep.company_name
+            FROM jobs j
+            LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id
+            WHERE j.status = 'active' AND j.is_featured = 1
+            ORDER BY j.created_at DESC
+            LIMIT ?
+        ");
+        $s->bind_param('i', $limit);
+        $s->execute();
+        $rows = $s->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // Fallback
+        if (empty($rows)) {
+            $s = $this->conn->prepare("
+                SELECT j.*, ep.company_name
+                FROM jobs j
+                LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id
+                WHERE j.status = 'active'
+                ORDER BY j.created_at DESC
+                LIMIT ?
+            ");
+            $s->bind_param('i', $limit);
+            $s->execute();
+            $rows = $s->get_result()->fetch_all(MYSQLI_ASSOC);
+        }
+
+        return $rows;
+    }
+
 }

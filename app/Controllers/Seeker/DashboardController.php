@@ -1,6 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/Models/User.php';
 require_once BASE_PATH . '/app/Models/Application.php';
+require_once BASE_PATH . '/app/Models/Job.php';
 
 class Seeker_DashboardController extends Controller
 {
@@ -11,8 +12,10 @@ class Seeker_DashboardController extends Controller
 
         $userModel = new User();
         $appModel = new Application();
+        $jobModel = new Job();
 
         $seeker = $userModel->findById($userId);
+        $recommendedJobs = $jobModel->getRecommendedJobs(5);
 
         // --- DYNAMIC CALCULATION (No more hardcoded 80!) ---
         $strength = 0;
@@ -25,8 +28,9 @@ class Seeker_DashboardController extends Controller
         $this->view('seeker/dashboard', [
             'strength'     => $strength,
             'totalApplied' => $appModel->countBySeeker($userId),
-            'recentApps'   => $appModel->recentBySeeker($userId, 5),
-            'seeker'       => $seeker // Always good to pass this to the view
+            'recentApps'   => $appModel->recentBySeeker($userId, 3),
+            'seeker'       => $seeker, // Always good to pass this to the view
+            'jobs'         => $recommendedJobs
         ]);
     }
 
@@ -65,4 +69,5 @@ class Seeker_DashboardController extends Controller
         header("Location: " . SITE_URL . "/seeker/applications");
         exit;
     }
+
 }

@@ -25,6 +25,7 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/owl.carousel.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/owl.theme.default.min.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/style_seeker.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/jg-styles.css">
     <style>
     /* ===== JOBGRIDS NAVBAR ===== */
