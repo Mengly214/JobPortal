@@ -177,7 +177,7 @@
 
                                 <!-- Status -->
                                 <td>
-                                    <span class="status-pill<?= $statusClass ?>"><?= $displayStatus ?></span>
+                                    <span class="status-pill <?= $statusClass ?>"><?= $displayStatus ?></span>
                                 </td>
 
                                 <!-- Actions -->
