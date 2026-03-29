@@ -150,4 +150,23 @@ class Application extends Model
 
         return $stmt->execute();
     }
+
+    // Create application with optional CV file
+    public function createWithCv(int $jobId, int $userId, string $cover, string $cv_file = ''): bool
+    {
+        $stmt = $this->conn->prepare(
+            "INSERT INTO applications (job_id, applicant_id, cover_letter, status, applied_at) VALUES (?,?,?,'submitted',NOW())"
+        );
+        $stmt->bind_param('iis', $jobId, $userId, $cover);
+        if (!$stmt->execute()) return false;
+
+        // If a new CV was uploaded, update the seeker's profile cv_file too
+        if ($cv_file) {
+            $u = $this->conn->prepare("UPDATE job_seeker_profiles SET cv_file=? WHERE user_id=?");
+            $u->bind_param('si', $cv_file, $userId);
+            $u->execute();
+        }
+        return true;
+    }
+
 }

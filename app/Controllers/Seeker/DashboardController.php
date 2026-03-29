@@ -11,49 +11,48 @@ class Seeker_DashboardController extends Controller
         $userId = (int)$_SESSION['user_id'];
 
         $userModel = new User();
-        $appModel = new Application();
-        $jobModel = new Job();
+        $appModel  = new Application();
+        $jobModel  = new Job();
 
-        $seeker = $userModel->findById($userId);
+        $seeker          = $userModel->findById($userId);
         $recommendedJobs = $jobModel->getRecommendedJobs(5);
 
-        // --- DYNAMIC CALCULATION (No more hardcoded 80!) ---
         $strength = 0;
-        if (!empty($seeker['email']))      $strength += 20; // Account
-        if (!empty($seeker['bio']))        $strength += 20; // Bio text
-        if (!empty($seeker['skills']))     $strength += 20; // Skills text
-        if (!empty($seeker['experience'])) $strength += 20; // Experience text
-        if (!empty($seeker['cv_file']))    $strength += 20; // CV filename
+        if (!empty($seeker['email']))      $strength += 20;
+        if (!empty($seeker['bio']))        $strength += 20;
+        if (!empty($seeker['skills']))     $strength += 20;
+        if (!empty($seeker['experience'])) $strength += 20;
+        if (!empty($seeker['cv_file']))    $strength += 20;
 
         $this->view('seeker/dashboard', [
             'strength'     => $strength,
             'totalApplied' => $appModel->countBySeeker($userId),
             'recentApps'   => $appModel->recentBySeeker($userId, 3),
-            'seeker'       => $seeker, // Always good to pass this to the view
-            'jobs'         => $recommendedJobs
+            'seeker'       => $seeker,
+            'jobs'         => $recommendedJobs,
         ]);
     }
 
-    // You can keep this or delete it if you don't use a separate applications page
     public function applications(): void
     {
         requireAuth();
-        $userId   = (int)$_SESSION['user_id'];
-        $conn     = $GLOBALS['conn'];
+        $userId = (int)$_SESSION['user_id'];
+        $conn   = $GLOBALS['conn'];
 
         $search = trim($_GET['search'] ?? '');
         $status = trim($_GET['status'] ?? '');
 
-        $where  = ["a.applicant_id = $userId"];
+        $where = ["a.applicant_id = $userId"];
         if ($status) $where[] = "a.status = '" . $conn->real_escape_string($status) . "'";
         if ($search) {
-            $s = $conn->real_escape_string($search);
+            $s       = $conn->real_escape_string($search);
             $where[] = "(j.title LIKE '%$s%' OR ep.company_name LIKE '%$s%')";
         }
         $w = implode(' AND ', $where);
 
         $applications = $conn->query("
-            SELECT a.*, j.title AS job_title, j.id AS job_id,
+            SELECT a.id, a.status, a.applied_at, a.job_id, a.applicant_id,
+                   j.title AS job_title, j.job_type, j.location_city,
                    j.deadline AS application_deadline, j.employer_id,
                    ep.company_name, ep.logo AS company_logo
             FROM applications a
@@ -66,6 +65,46 @@ class Seeker_DashboardController extends Controller
 
         $this->view('seeker/applications', ['applications' => $applications]);
     }
+
+    /**
+     * Standalone status-tracking page for a single application.
+     * URL: /seeker/application/{id}
+     */
+    public function viewStatus(int $appId): void
+    {
+        requireAuth();
+        $userId = (int)$_SESSION['user_id'];
+        $conn   = $GLOBALS['conn'];
+
+        $appId = (int)$appId;
+
+        $result = $conn->query("
+            SELECT a.id, a.status, a.applied_at, a.job_id, a.applicant_id,
+                   j.title AS job_title, j.job_type, j.location_city,
+                   j.deadline AS application_deadline, j.employer_id,
+                   ep.company_name, ep.logo AS company_logo
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id
+            WHERE a.id = $appId AND a.applicant_id = $userId
+            LIMIT 1
+        ");
+
+        if (!$result || $result->num_rows === 0) {
+            // Not found or doesn't belong to this seeker — redirect back
+            header('Location: ' . SITE_URL . '/seeker/applications');
+            exit;
+        }
+
+        $application = $result->fetch_assoc();
+
+        $this->view('seeker/application-status', [
+            'pageTitle'   => 'Application Status — ' . $application['job_title'],
+            'activePage'  => '',
+            'application' => $application,
+        ]);
+    }
+
     public function viewEmployer(int $employerId): void
     {
         requireAuth();
@@ -86,7 +125,6 @@ class Seeker_DashboardController extends Controller
             exit;
         }
 
-        // Active jobs from this employer
         $jobs = $conn->query("
             SELECT j.id, j.title, j.job_type, j.location_city, j.salary_min,
                    j.salary_max, j.salary_currency, j.created_at, j.deadline,
@@ -108,25 +146,16 @@ class Seeker_DashboardController extends Controller
 
     public function withdraw(): void
     {
-        // 1. Check if it is a secure POST request
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['application_id'])) {
-
             $applicationId = (int)$_POST['application_id'];
+            $seekerId      = $_SESSION['user_id'] ?? 0;
 
-            // Make sure you use whatever session variable stores your logged-in user's ID!
-            $seekerId = $_SESSION['user_id'] ?? 0;
-
-            // 2. Load the Application model (make sure the path matches your structure)
             require_once BASE_PATH . '/app/Models/Application.php';
             $appModel = new Application();
-
-            // 3. Delete the application
             $appModel->withdraw($applicationId, $seekerId);
         }
 
-        // 4. Redirect the user back to the applications dashboard
-        header("Location: " . SITE_URL . "/seeker/applications");
+        header('Location: ' . SITE_URL . '/seeker/applications');
         exit;
     }
-
 }

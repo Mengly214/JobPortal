@@ -100,6 +100,8 @@ $router->get('/seeker/applications', 'Seeker/DashboardController', 'applications
 $router->get('/seeker/employer/:id', 'Seeker/DashboardController', 'viewEmployer');
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
 $router->post('/seeker/withdraw',    'Seeker/DashboardController', 'withdraw');
+$router->get('/seeker/application/(\d+)', 'Seeker/DashboardController', 'viewStatus');
+
 $router->dispatch();
 
 
