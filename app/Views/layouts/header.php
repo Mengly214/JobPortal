@@ -259,7 +259,8 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
                         <a href="<?php echo SITE_URL; ?>/admin/profile"><i class="fa fa-user-circle"></i> My Profile</a>
                         <?php elseif ($_SESSION['role'] === 'employer'): ?>
                         <a href="<?php echo SITE_URL; ?>/employer/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
-                        <a href="<?php echo SITE_URL; ?>/employer/post-job"><i class="fa fa-plus-circle"></i> Post a Job</a>
+                        <a href="<?php echo SITE_URL; ?>/employer/jobs/create"><i class="fa fa-plus-circle"></i> Post a Job</a>
+                        
                         <div class="divider"></div>
                         <a href="<?php echo SITE_URL; ?>/employer/profile"><i class="fa fa-user-circle"></i> My Profile</a>
                         <?php else: ?>

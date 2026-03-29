@@ -38,15 +38,74 @@ class Seeker_DashboardController extends Controller
     public function applications(): void
     {
         requireAuth();
-        $userId = (int)$_SESSION['user_id'];
-        $appModel = new Application();
+        $userId   = (int)$_SESSION['user_id'];
+        $conn     = $GLOBALS['conn'];
 
-        // Fetch the FULL list for the applications page
-        $data['applications'] = $appModel->recentBySeeker($userId, 50);
+        $search = trim($_GET['search'] ?? '');
+        $status = trim($_GET['status'] ?? '');
 
-        // LOAD THE SPECIFIC VIEW YOU SHARED EARLIER
-        $this->view('seeker/applications', $data);
+        $where  = ["a.applicant_id = $userId"];
+        if ($status) $where[] = "a.status = '" . $conn->real_escape_string($status) . "'";
+        if ($search) {
+            $s = $conn->real_escape_string($search);
+            $where[] = "(j.title LIKE '%$s%' OR ep.company_name LIKE '%$s%')";
+        }
+        $w = implode(' AND ', $where);
+
+        $applications = $conn->query("
+            SELECT a.*, j.title AS job_title, j.id AS job_id,
+                   j.deadline AS application_deadline, j.employer_id,
+                   ep.company_name, ep.logo AS company_logo
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id
+            WHERE $w
+            ORDER BY a.applied_at DESC
+            LIMIT 100
+        ")->fetch_all(MYSQLI_ASSOC);
+
+        $this->view('seeker/applications', ['applications' => $applications]);
     }
+    public function viewEmployer(int $employerId): void
+    {
+        requireAuth();
+        $conn = $GLOBALS['conn'];
+
+        $employer = $conn->query("
+            SELECT u.id, u.full_name, u.email, u.avatar, u.created_at,
+                   ep.company_name, ep.logo, ep.location_city, ep.website,
+                   ep.industry, ep.company_size, ep.description AS company_desc
+            FROM users u
+            JOIN employer_profiles ep ON u.id = ep.user_id
+            WHERE u.id = $employerId AND u.role = 'employer' AND u.is_active = 1
+            LIMIT 1
+        ")->fetch_assoc();
+
+        if (!$employer) {
+            header('Location: ' . SITE_URL . '/seeker/applications');
+            exit;
+        }
+
+        // Active jobs from this employer
+        $jobs = $conn->query("
+            SELECT j.id, j.title, j.job_type, j.location_city, j.salary_min,
+                   j.salary_max, j.salary_currency, j.created_at, j.deadline,
+                   c.name AS category_name
+            FROM jobs j
+            LEFT JOIN categories c ON j.category_id = c.id
+            WHERE j.employer_id = $employerId AND j.status = 'active'
+            ORDER BY j.created_at DESC
+            LIMIT 10
+        ")->fetch_all(MYSQLI_ASSOC);
+
+        $this->view('seeker/employer-profile', [
+            'pageTitle'  => ($employer['company_name'] ?? 'Company') . ' — Profile',
+            'activePage' => '',
+            'employer'   => $employer,
+            'jobs'       => $jobs,
+        ]);
+    }
+
     public function withdraw(): void
     {
         // 1. Check if it is a secure POST request

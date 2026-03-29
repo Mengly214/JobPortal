@@ -24,12 +24,12 @@
                          <h6 class="card-header-title mb-4"><i class="fa fa-bolt" style="color: #0a65cc;"></i> Profile Strength</h6>
                          <div class="d-flex justify-content-between mb-2">
                               <small class="text-muted fw-bold">Completion</small>
-                              <small class="text-success fw-bold"><?= $data['strength'] ?>%</small>
+                              <small class="text-success fw-bold"><?= $strength ?>%</small>
                          </div>
                          <div class="progress mb-4" style="height: 8px; border-radius: 8px; background-color: #e2e8f0;">
-                              <div class="progress-bar bg-success" role="progressbar" style="width: <?= $data['strength'] ?>%; border-radius: 8px;"></div>
+                              <div class="progress-bar bg-success" role="progressbar" style="width: <?= $strength ?>%; border-radius: 8px;"></div>
                          </div>
-                         <?php if ($data['strength'] < 100): ?>
+                         <?php if ($strength < 100): ?>
                               <div class="alert alert-warning border-0 d-flex align-items-start gap-2 p-3 mb-0" style="background: #fffbeb; border-radius: 8px;">
                                    <i class="fa fa-lightbulb-o mt-1" style="color: #b6b624;"></i>
                                    <small class="text-dark" style="line-height: 1.5;">Add more information to reach 100% and stand out to employers!</small>
@@ -39,7 +39,7 @@
                     </div>
 
                     <div class="stat-box">
-                         <h1 style="color:white;"><?= $data['totalApplied'] ?? 0 ?></h1>
+                         <h1 style="color:white;"><?= $totalApplied ?? 0 ?></h1>
                          <p>Total Applications</p>
                     </div>
 
@@ -81,7 +81,40 @@
                                              <td><?= htmlspecialchars($app['job_title']) ?></td>
                                              <!-- Status -->
                                              <td>
-                                                  <span class="date-text"><?= htmlspecialchars($app['status']) ?></span>
+                                                  <?php
+                                                  $ds = $app['status'];
+                                                  $dpill = match($ds) {
+                                                      'submitted'   => ['status-teal',   'fa-paper-plane',  'Received'],
+                                                      'reviewing'   => ['status-blue',   'fa-search',       'In Review'],
+                                                      'shortlisted' => ['status-purple', 'fa-star',         'Shortlisted'],
+                                                      'interview'   => ['status-orange', 'fa-calendar',     'Interview'],
+                                                      'offered'     => ['status-indigo', 'fa-envelope-open','Offer Received'],
+                                                      'hired'       => ['status-green',  'fa-trophy',       'Hired 🎉'],
+                                                      'rejected'    => ['status-red',    'fa-times-circle', 'Not Selected'],
+                                                      'withdrawn'   => ['status-gray',   'fa-minus-circle', 'Withdrawn'],
+                                                      default       => ['status-gray',   'fa-circle',       ucfirst($ds)],
+                                                  };
+                                                  ?>
+                                                  <span class="status-pill <?= $dpill[0] ?>">
+                                                      <i class="fa <?= $dpill[1] ?>"></i> <?= $dpill[2] ?>
+                                                  </span>
+                                                  <?php if ($ds === 'interview'): ?>
+                                                      <div class="dash-status-hint dash-hint-orange">
+                                                          <i class="fa fa-phone"></i> Employer will contact you
+                                                      </div>
+                                                  <?php elseif ($ds === 'shortlisted'): ?>
+                                                      <div class="dash-status-hint dash-hint-purple">
+                                                          <i class="fa fa-star"></i> Interview may follow
+                                                      </div>
+                                                  <?php elseif ($ds === 'hired'): ?>
+                                                      <div class="dash-status-hint dash-hint-green">
+                                                          <i class="fa fa-check-circle"></i> Congratulations!
+                                                      </div>
+                                                  <?php elseif ($ds === 'rejected'): ?>
+                                                      <div class="dash-status-hint dash-hint-red">
+                                                          <i class="fa fa-heart"></i> Keep going!
+                                                      </div>
+                                                  <?php endif; ?>
                                              </td>
                                              <!-- Date -->
                                              <td>
@@ -149,5 +182,24 @@
           </div>
      </div>
 </section>
+
+<style>
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.status-pill i{font-size:10px}
+.status-teal{background:#e0f7f0;color:#0d7a57}
+.status-blue{background:#e8f0fe;color:#0a65cc}
+.status-purple{background:#f0ebff;color:#6c3fc5}
+.status-orange{background:#fff4e5;color:#b45309}
+.status-indigo{background:#eef2ff;color:#3730a3}
+.status-green{background:#e8f5e9;color:#2e7d32}
+.status-red{background:#fef2f2;color:#e53935}
+.status-gray{background:#f1f5f9;color:#64748b}
+.dash-status-hint{display:flex;align-items:center;gap:4px;margin-top:4px;font-size:11px;font-weight:600}
+.dash-status-hint i{font-size:11px}
+.dash-hint-orange{color:#b45309}
+.dash-hint-purple{color:#6c3fc5}
+.dash-hint-green{color:#2e7d32}
+.dash-hint-red{color:#c0392b}
+</style>
 
 <?php require BASE_PATH . '/app/Views/layouts/footer.php'; ?>

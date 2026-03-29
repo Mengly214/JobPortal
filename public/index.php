@@ -81,19 +81,25 @@ $router->any('/admin/settings',               'Admin/SettingsController',     'i
 $router->get('/employer/dashboard', 'Employer/DashboardController', 'index');
 $router->any('/employer/profile', 'Employer/ProfileController', 'index');
 
+// Employer Jobs
+$router->get('/employer/jobs',                   'Employer/JobsController', 'index');
+$router->any('/employer/jobs/create',            'Employer/JobsController', 'create');
+$router->any('/employer/jobs/edit/:id',          'Employer/JobsController', 'edit');
+$router->get('/employer/jobs/toggle/:id',        'Employer/JobsController', 'toggle');
+$router->get('/employer/jobs/delete/:id',        'Employer/JobsController', 'delete');
+
 // Employer Applications
-$router->get('/employer/applications', 'Employer/ApplicationsController', 'index');        // List all applications
-$router->get('/employer/applications/:id', 'Employer/ApplicationsController', 'show');    // View single application
-$router->post('/employer/applications/updateStatus', 'Employer/ApplicationsController', 'updateStatus'); // Update application status
+$router->get('/employer/applications', 'Employer/ApplicationsController', 'index');
+$router->get('/employer/applications/:id', 'Employer/ApplicationsController', 'show');
+$router->get('/employer/seeker/:id', 'Employer/ApplicationsController', 'viewSeeker');
+$router->post('/employer/applications/updateStatus', 'Employer/ApplicationsController', 'updateStatus');
 
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
+$router->get('/seeker/applications', 'Seeker/DashboardController', 'applications');
+$router->get('/seeker/employer/:id', 'Seeker/DashboardController', 'viewEmployer');
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
-$router->post('/seeker/withdraw', 'Seeker/DashboardController', 'withdraw');
-// Seeker
-$router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
-$router->get('/seeker/applications', 'Seeker/DashboardController', 'applications'); // Add this line
-$router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
+$router->post('/seeker/withdraw',    'Seeker/DashboardController', 'withdraw');
 $router->dispatch();
 
 
