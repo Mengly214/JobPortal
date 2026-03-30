@@ -94,6 +94,19 @@ $router->get('/employer/applications/:id', 'Employer/ApplicationsController', 's
 $router->get('/employer/seeker/:id', 'Employer/ApplicationsController', 'viewSeeker');
 $router->post('/employer/applications/updateStatus', 'Employer/ApplicationsController', 'updateStatus');
 
+// Employer messaging
+$router->get('/employer/messages/:id',   'Employer/MessagesController', 'thread');
+$router->post('/employer/messages/send', 'Employer/MessagesController', 'send');
+ 
+// Seeker messaging
+$router->get('/seeker/messages/:id',     'Seeker/MessagesController',  'thread');
+$router->post('/seeker/messages/send',   'Seeker/MessagesController',  'send');
+ 
+// Seeker: standalone application status page (add this too if not done yet)
+$router->get('/seeker/application/:id',  'Seeker/DashboardController',  'viewStatus');
+
+
+$router->get('/employer/report', 'Employer/ReportController', 'index');
 // Seeker
 $router->get('/seeker/dashboard',    'Seeker/DashboardController', 'index');
 $router->get('/seeker/applications', 'Seeker/DashboardController', 'applications');
@@ -101,6 +114,7 @@ $router->get('/seeker/employer/:id', 'Seeker/DashboardController', 'viewEmployer
 $router->any('/seeker/profile',      'Seeker/ProfileController',   'index');
 $router->post('/seeker/withdraw',    'Seeker/DashboardController', 'withdraw');
 $router->get('/seeker/application/(\d+)', 'Seeker/DashboardController', 'viewStatus');
+$router->get('/seeker/report', 'Seeker/ReportController', 'index');
 
 $router->dispatch();
 

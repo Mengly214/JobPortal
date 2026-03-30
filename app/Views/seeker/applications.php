@@ -97,6 +97,12 @@
         ];
         ?>
 
+        <?php
+        // Load message model once for unread counts across all cards
+        require_once BASE_PATH . '/app/Models/Message.php';
+        $msgModel = new Message();
+        ?>
+
         <div class="jg-apps-cards js-reveal">
         <?php foreach ($applications as $app):
             $status     = $app['status'];
@@ -113,6 +119,9 @@
                 elseif ($daysLeft <= 7) { $deadlineLbl = $daysLeft.'d left';  $deadlineCls = 'dl-red'; }
                 else                    { $deadlineLbl = $daysLeft.'d left';  $deadlineCls = 'dl-green'; }
             }
+
+            // Unread messages from employer for this application
+            $unread = $msgModel->countUnreadForApp($appId, 'job_seeker');
         ?>
 
         <!-- Application Card — whole card is a link to the status page -->
@@ -145,6 +154,11 @@
                     <span class="status-pill <?= $cfg['pill'] ?>">
                         <i class="fa <?= $cfg['icon'] ?>"></i> <?= $cfg['label'] ?>
                     </span>
+                    <?php if ($unread > 0): ?>
+                    <span class="app-card__msg-badge">
+                        <i class="fa fa-envelope"></i> <?= $unread ?> new message<?= $unread > 1 ? 's' : '' ?>
+                    </span>
+                    <?php endif; ?>
                     <div class="app-card__track-hint"><i class="fa fa-arrow-right"></i> Track Status</div>
                 </div>
             </div>
@@ -173,6 +187,14 @@
             <?php elseif ($status === 'withdrawn'): ?>
             <div class="app-card__terminal app-card__terminal--gray">
                 <i class="fa fa-minus-circle"></i> You withdrew this application.
+            </div>
+            <?php endif; ?>
+
+            <?php if ($unread > 0): ?>
+            <div class="app-card__msg-strip">
+                <i class="fa fa-envelope"></i>
+                <strong><?= $unread ?> unread message<?= $unread > 1 ? 's' : '' ?> from the employer</strong>
+                <span>· Click to read</span>
             </div>
             <?php endif; ?>
 
@@ -232,7 +254,15 @@
 .pip-current .pip-label{color:#0a65cc;font-weight:800}
 .pip-line--done{background:linear-gradient(90deg,#2e7d32,#0a65cc)}
 
-/* Terminal */
+/* Unread message badge (top-right of card) */
+.app-card__msg-badge{display:inline-flex;align-items:center;gap:4px;background:#e53935;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;animation:pulse-badge 2s ease-in-out infinite}
+@keyframes pulse-badge{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.4)}50%{box-shadow:0 0 0 5px rgba(229,57,53,0)}}
+
+/* Unread message strip (bottom of card) */
+.app-card__msg-strip{display:flex;align-items:center;gap:8px;padding:9px 20px;background:linear-gradient(90deg,#fff5f5,#fef2f2);border-top:1px solid #fca5a5;font-size:12px;color:#e53935}
+.app-card__msg-strip i{font-size:13px;flex-shrink:0}
+.app-card__msg-strip strong{font-weight:700}
+.app-card__msg-strip span{color:#f87171}
 .app-card__terminal{padding:10px 20px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;border-top:1px solid #f0f4f8}
 .app-card__terminal--red {background:#fff5f5;color:#c0392b}
 .app-card__terminal--gray{background:#f8fafc;color:#64748b}

@@ -316,6 +316,19 @@ if ($deadlineStr) {
                             <i class="fa fa-building-o"></i> View Company
                         </a>
                         <?php endif; ?>
+                        <a href="<?= SITE_URL ?>/seeker/messages/<?= $app['id'] ?>" class="ast-action-btn ast-action-btn--outline">
+                            <i class="fa fa-envelope"></i> Messages
+                            <?php
+                            // Show unread badge if there are unread messages from employer
+                            if (file_exists(BASE_PATH . '/app/Models/Message.php')) {
+                                require_once BASE_PATH . '/app/Models/Message.php';
+                                $msgModel = new Message();
+                                $unread   = $msgModel->countUnreadForApp((int)$app['id'], 'job_seeker');
+                                if ($unread > 0):
+                            ?>
+                            <span style="background:#e53935;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:auto"><?= $unread ?></span>
+                            <?php endif; } ?>
+                        </a>
                         <a href="<?= SITE_URL ?>/seeker/applications" class="ast-action-btn ast-action-btn--outline">
                             <i class="fa fa-arrow-left"></i> All Applications
                         </a>

@@ -19,7 +19,7 @@
                <div class="col-md-4">
                     <div class="premium-card">
                          <div>
-                              <a href="<?= SITE_URL ?>/seeker/profile" class="btn btn-soft rounded-pill px-4 py-2" style="font-size: 14px;">Edit Profile</a>
+                              <a href="<?= SITE_URL ?>/seeker/profile" class="btn btn-soft rounded-pill px-4 py-2" style="font-size: 14px;">Edit Profile</a> <a href="<?= SITE_URL ?>/seeker/report" class="btn rounded-pill px-3 py-2" style="font-size:13px;background:#eef3fd;color:#0a65cc;border:1px solid #d4e6fb;font-weight:700;margin-left:6px"><i class="fa fa-bar-chart"></i> Report</a>
                          </div><br>
                          <h6 class="card-header-title mb-4"><i class="fa fa-bolt" style="color: #0a65cc;"></i> Profile Strength</h6>
                          <div class="d-flex justify-content-between mb-2">

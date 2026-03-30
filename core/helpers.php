@@ -25,3 +25,5 @@ function requireRole(string $role): void {
 function requireAuth(): void {
     if (!isLoggedIn()) redirect('login');
 }
+
+ 

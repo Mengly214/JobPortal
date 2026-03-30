@@ -127,6 +127,9 @@
                 <a href="<?= SITE_URL ?>/uploads/resumes/<?= htmlspecialchars($app['cv_file']) ?>" download class="act-btn" style="margin-top:6px;width:100%;justify-content:center">
                     <i class="fa fa-download"></i> Download CV
                 </a>
+                <a href="<?= SITE_URL ?>/employer/messages/<?= $app['id'] ?>" class="jg-btn jg-btn--sm jg-btn--outline">
+    <i class="fa fa-envelope"></i> Message
+</a>
                 <?php endif; ?>
             </div>
         </div>

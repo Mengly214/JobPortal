@@ -87,6 +87,7 @@
                <nav class="profile-nav" style="text-align:left">
                     <a href="<?php echo SITE_URL; ?>/employer/profile" class="active"><i class="fa fa-building"></i> Company Profile</a>
                     <a href="<?php echo SITE_URL; ?>/employer/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
+                    <a href="<?php echo SITE_URL; ?>/employer/report"><i class="fa fa-bar-chart"></i> Company Report</a>
                     <a href="<?php echo SITE_URL; ?>/jobs"><i class="fa fa-briefcase"></i> Browse Jobs</a>
                     <a href="<?php echo SITE_URL; ?>/logout" style="color:#e53935"><i class="fa fa-sign-out" style="color:#e53935"></i> Logout</a>
                </nav>

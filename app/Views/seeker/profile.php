@@ -25,6 +25,7 @@
                <nav class="profile-nav" style="text-align:left">
                     <a href="<?php echo SITE_URL; ?>/seeker/profile" class="active"><i class="fa fa-user"></i> My Profile</a>
                     <a href="<?php echo SITE_URL; ?>/seeker/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
+                    <a href="<?php echo SITE_URL; ?>/seeker/report"><i class="fa fa-bar-chart"></i> My Report</a>
                     <a href="<?php echo SITE_URL; ?>/jobs"><i class="fa fa-briefcase"></i> Browse Jobs</a>
                     <a href="<?php echo SITE_URL; ?>/logout" style="color:#e53935"><i class="fa fa-sign-out" style="color:#e53935"></i> Logout</a>
                </nav>
