@@ -116,6 +116,9 @@ $router->post('/seeker/withdraw',    'Seeker/DashboardController', 'withdraw');
 $router->get('/seeker/application/(\d+)', 'Seeker/DashboardController', 'viewStatus');
 $router->get('/seeker/report', 'Seeker/ReportController', 'index');
 
+$router->get('/api/messages/:id',  'MessagesApiController', 'poll');
+$router->post('/api/messages/:id', 'MessagesApiController', 'send');
+
 $router->dispatch();
 
 

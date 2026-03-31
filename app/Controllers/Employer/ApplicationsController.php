@@ -135,15 +135,23 @@ class Employer_ApplicationsController extends Controller {
         $jobId  = (int)($_POST['job_id'] ?? 0);
 
         $allowed = ['submitted','reviewing','shortlisted','interview','offered','hired','rejected','withdrawn'];
+        $ok = false;
         if ($appId && in_array($status, $allowed)) {
-            $conn->query("
-                UPDATE applications a
-                JOIN jobs j ON a.job_id = j.id
-                SET a.status = '" . addslashes($status) . "'
-                WHERE a.id = $appId AND j.employer_id = {$this->employerId}
-            ");
+            $s = $conn->prepare("UPDATE applications a JOIN jobs j ON a.job_id = j.id SET a.status = ? WHERE a.id = ? AND j.employer_id = ?");
+            $s->bind_param('sii', $status, $appId, $this->employerId);
+            $ok = $s->execute() && $s->affected_rows > 0;
         }
 
+        // AJAX request — return JSON
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+               || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
+        if ($isAjax || !$jobId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => $ok]);
+            exit;
+        }
+
+        // Normal form POST fallback
         $redirect = SITE_URL . '/employer/applications';
         if ($jobId) $redirect .= '?job=' . $jobId;
         $redirect .= (strpos($redirect, '?') !== false ? '&' : '?') . 'updated=1';

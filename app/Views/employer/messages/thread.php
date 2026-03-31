@@ -1,15 +1,16 @@
 <?php require BASE_PATH . '/app/Views/layouts/header.php'; ?>
 <?php
 $myId      = (int)$_SESSION['user_id'];
-$myRole    = 'employer';
-$sendUrl   = SITE_URL . '/employer/messages/send';
-$backUrl   = SITE_URL . '/employer/applications';
 $otherName = htmlspecialchars($app['applicant_name'] ?? 'Applicant');
 $otherAv   = $app['applicant_avatar'] ?? '';
 $otherInit = strtoupper(substr($app['applicant_name'] ?? 'A', 0, 1));
-$companyLogo = $app['company_logo'] ?? '';
-$companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
+$lastMsgId = !empty($messages) ? (int)end($messages)['id'] : 0;
 ?>
+
+<!-- Hidden config for JS -->
+<input type="hidden" id="msg-app-id"   value="<?= $app['id'] ?>">
+<input type="hidden" id="msg-api-base" value="<?= SITE_URL ?>/api/messages">
+<input type="hidden" id="msg-last-id"  value="<?= $lastMsgId ?>">
 
 <!-- Hero -->
 <div class="msg-hero">
@@ -19,7 +20,7 @@ $companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
             <i class="fa fa-angle-right"></i>
             <a href="<?= SITE_URL ?>/employer/applications">Applications</a>
             <i class="fa fa-angle-right"></i>
-            <span>Message</span>
+            <span>Message — <?= $otherName ?></span>
         </div>
         <div class="msg-hero__content">
             <div class="msg-hero__avatar">
@@ -34,9 +35,9 @@ $companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
                 <p class="msg-hero__sub">
                     <i class="fa fa-briefcase"></i> <?= htmlspecialchars($app['job_title']) ?>
                     &nbsp;·&nbsp;
-                    <a href="<?= SITE_URL ?>/employer/seeker/<?= $app['applicant_id'] ?>" style="color:rgba(255,255,255,.8);text-decoration:underline">View Profile</a>
+                    <a href="<?= SITE_URL ?>/employer/seeker/<?= $app['applicant_id'] ?>">View Profile</a>
                     &nbsp;·&nbsp;
-                    <a href="<?= SITE_URL ?>/employer/applications" style="color:rgba(255,255,255,.8);text-decoration:underline"><i class="fa fa-arrow-left"></i> Back</a>
+                    <a href="<?= SITE_URL ?>/employer/applications"><i class="fa fa-arrow-left"></i> Back</a>
                 </p>
             </div>
         </div>
@@ -59,7 +60,7 @@ $companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
                 <?php foreach ($messages as $m):
                     $isMe = ((int)$m['sender_id'] === $myId);
                 ?>
-                <div class="msg-bubble <?= $isMe ? 'msg-bubble--me' : 'msg-bubble--them' ?>">
+                <div class="msg-bubble <?= $isMe ? 'msg-bubble--me' : 'msg-bubble--them' ?>" data-id="<?= $m['id'] ?>">
                     <?php if (!$isMe): ?>
                     <div class="msg-bubble__av">
                         <?php if ($otherAv): ?>
@@ -73,10 +74,7 @@ $companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
                         <div class="msg-bubble__text"><?= nl2br(htmlspecialchars($m['message'])) ?></div>
                         <div class="msg-bubble__meta">
                             <?= $isMe ? 'You' : htmlspecialchars($m['sender_name']) ?>
-                            &nbsp;·&nbsp;
-                            <span title="<?= htmlspecialchars($m['created_at']) ?>">
-                                <?= date('d M Y, g:i a', strtotime($m['created_at'])) ?>
-                            </span>
+                            &nbsp;·&nbsp; <?= date('d M Y, g:i a', strtotime($m['created_at'])) ?>
                             <?php if ($isMe && $m['is_read']): ?>
                                 <i class="fa fa-check-circle" style="color:#14a077;margin-left:4px" title="Read"></i>
                             <?php endif; ?>
@@ -87,16 +85,23 @@ $companyInit = strtoupper(substr($app['company_name'] ?? 'C', 0, 1));
                 <?php endif; ?>
             </div>
 
-            <!-- Compose -->
-            <form class="msg-compose" action="<?= $sendUrl ?>" method="POST">
-                <input type="hidden" name="app_id" value="<?= $app['id'] ?>">
-                <textarea class="msg-compose__input" name="message" rows="1"
-                    placeholder="Type a message to <?= $otherName ?>..."
-                    required maxlength="2000"></textarea>
-                <button type="submit" class="msg-compose__send">
+            <!-- Live status bar -->
+            <div class="msg-statusbar">
+                <span class="msg-statusbar__dot"></span>
+                <span class="msg-statusbar__text">Connecting…</span>
+                <span style="margin-left:auto;font-size:10px;color:#c0cad8">Updates every 3s &nbsp;·&nbsp; Ctrl+Enter to send</span>
+            </div>
+
+            <!-- Compose (no action/method — handled by JS) -->
+            <form class="msg-compose" id="msg-form">
+                <textarea class="msg-compose__input" id="msg-input" rows="1"
+                    placeholder="Type a message to <?= $otherName ?>…"
+                    maxlength="2000"></textarea>
+                <button type="submit" class="msg-compose__send" title="Send (Ctrl+Enter)">
                     <i class="fa fa-paper-plane"></i>
                 </button>
             </form>
+
         </div>
     </div>
 </section>
