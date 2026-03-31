@@ -125,6 +125,51 @@ if ($deadlineStr) {
                     </div>
                 </div>
 
+                <?php
+                $nextSteps = [
+                            'submitted'   => [
+                                ['icon'=>'fa-clock-o',    'title'=>'Wait for review',    'desc'=>'The employer will review your application shortly. This typically takes 3–7 business days.'],
+                                ['icon'=>'fa-bell-o',     'title'=>'Stay alert',          'desc'=>'Keep an eye on your email and phone — the employer may reach out directly.'],
+                                ['icon'=>'fa-user-circle','title'=>'Keep your profile updated','desc'=>'A complete profile improves your chances. Add skills, experience, and your latest CV.'],
+                            ],
+                            'reviewing'   => [
+                                ['icon'=>'fa-search',     'title'=>'Employer is evaluating','desc'=>'Your profile is being assessed against the job requirements and other applicants.'],
+                                ['icon'=>'fa-file-text-o','title'=>'Ensure your CV is ready','desc'=>'If invited for an interview, your CV may come up. Make sure it is current and tailored.'],
+                                ['icon'=>'fa-envelope-o', 'title'=>'Check for messages',   'desc'=>'The employer may send a message or invite you for an interview very soon.'],
+                            ],
+                            'shortlisted' => [
+                                ['icon'=>'fa-calendar-check-o','title'=>'Interview incoming','desc'=>'Shortlisted candidates are usually contacted within a few days to schedule an interview.'],
+                                ['icon'=>'fa-graduation-cap',  'title'=>'Prepare thoroughly','desc'=>'Research the company, re-read the job description, and prepare your best answers.'],
+                                ['icon'=>'fa-phone',           'title'=>'Be reachable',     'desc'=>'The employer may call or email to schedule. Keep your contact details current.'],
+                            ],
+                            'interview'   => [
+                                ['icon'=>'fa-calendar',   'title'=>'Confirm the details',  'desc'=>'Reply promptly to the employer\'s message and confirm the date, time, and format.'],
+                                ['icon'=>'fa-book',       'title'=>'Prepare and practice', 'desc'=>'Review the job requirements, practise common interview questions, and know your CV well.'],
+                                ['icon'=>'fa-thumbs-o-up','title'=>'Give your best',       'desc'=>'Show up on time, be confident, and let your personality and skills shine through.'],
+                            ],
+                            'offered'     => [
+                                ['icon'=>'fa-envelope-open','title'=>'Review the offer',   'desc'=>'Read the offer letter carefully — salary, benefits, start date, and any conditions.'],
+                                ['icon'=>'fa-comments-o',  'title'=>'Negotiate if needed', 'desc'=>'It is perfectly acceptable to ask questions or negotiate reasonable terms professionally.'],
+                                ['icon'=>'fa-check-circle','title'=>'Respond promptly',    'desc'=>'Accept or decline within the timeframe given. The employer is waiting for your decision.'],
+                            ],
+                            'hired'       => [
+                                ['icon'=>'fa-handshake-o','title'=>'Onboarding details',   'desc'=>'Expect an email or call from HR with your start date, documents, and first-day instructions.'],
+                                ['icon'=>'fa-id-card-o',  'title'=>'Prepare your documents','desc'=>'Have your ID, tax forms, and any certifications ready ahead of your start date.'],
+                                ['icon'=>'fa-star-o',     'title'=>'Celebrate!',            'desc'=>'You earned it. Best of luck in your new role — this is just the beginning!'],
+                            ],
+                            'rejected'    => [
+                                ['icon'=>'fa-search',       'title'=>'Keep searching',      'desc'=>'There are many great opportunities on JobPortal. Browse today\'s listings and apply again.'],
+                                ['icon'=>'fa-pencil',       'title'=>'Refine your profile', 'desc'=>'Review your CV, improve your skills section, and make sure your profile stands out.'],
+                                ['icon'=>'fa-heart-o',      'title'=>'Stay positive',       'desc'=>'Rejections are part of the journey. Every application is valuable experience. Keep going!'],
+                            ],
+                            'withdrawn'   => [
+                                ['icon'=>'fa-search',    'title'=>'Browse more jobs',    'desc'=>'Explore thousands of opportunities on JobPortal that match your skills and goals.'],
+                                ['icon'=>'fa-star-o',    'title'=>'Update your profile', 'desc'=>'Refresh your CV and skills to make your next application even stronger.'],
+                                ['icon'=>'fa-thumbs-o-up','title'=>'You know your worth','desc'=>'Withdrawing shows self-awareness. Find a role that is the right fit for you.'],
+                            ],
+                ];
+                ?>
+
                 <!-- Progress tracker -->
                 <?php if (!$isTerminal): ?>
                 <div class="ast-card">
@@ -174,54 +219,10 @@ if ($deadlineStr) {
                         <?php endforeach; ?>
                     </div>
                 </div>
-
-                <!-- What happens next -->
                 <div class="ast-card">
                     <div class="ast-card__title"><i class="fa fa-question-circle"></i> What Happens Next?</div>
                     <div class="ast-next-steps">
                         <?php
-                        $nextSteps = [
-                            'submitted'   => [
-                                ['icon'=>'fa-clock-o',    'title'=>'Wait for review',    'desc'=>'The employer will review your application shortly. This typically takes 3–7 business days.'],
-                                ['icon'=>'fa-bell-o',     'title'=>'Stay alert',          'desc'=>'Keep an eye on your email and phone — the employer may reach out directly.'],
-                                ['icon'=>'fa-user-circle','title'=>'Keep your profile updated','desc'=>'A complete profile improves your chances. Add skills, experience, and your latest CV.'],
-                            ],
-                            'reviewing'   => [
-                                ['icon'=>'fa-search',     'title'=>'Employer is evaluating','desc'=>'Your profile is being assessed against the job requirements and other applicants.'],
-                                ['icon'=>'fa-file-text-o','title'=>'Ensure your CV is ready','desc'=>'If invited for an interview, your CV may come up. Make sure it is current and tailored.'],
-                                ['icon'=>'fa-envelope-o', 'title'=>'Check for messages',   'desc'=>'The employer may send a message or invite you for an interview very soon.'],
-                            ],
-                            'shortlisted' => [
-                                ['icon'=>'fa-calendar-check-o','title'=>'Interview incoming','desc'=>'Shortlisted candidates are usually contacted within a few days to schedule an interview.'],
-                                ['icon'=>'fa-graduation-cap',  'title'=>'Prepare thoroughly','desc'=>'Research the company, re-read the job description, and prepare your best answers.'],
-                                ['icon'=>'fa-phone',           'title'=>'Be reachable',     'desc'=>'The employer may call or email to schedule. Keep your contact details current.'],
-                            ],
-                            'interview'   => [
-                                ['icon'=>'fa-calendar',   'title'=>'Confirm the details',  'desc'=>'Reply promptly to the employer\'s message and confirm the date, time, and format.'],
-                                ['icon'=>'fa-book',       'title'=>'Prepare and practice', 'desc'=>'Review the job requirements, practise common interview questions, and know your CV well.'],
-                                ['icon'=>'fa-thumbs-o-up','title'=>'Give your best',       'desc'=>'Show up on time, be confident, and let your personality and skills shine through.'],
-                            ],
-                            'offered'     => [
-                                ['icon'=>'fa-envelope-open','title'=>'Review the offer',   'desc'=>'Read the offer letter carefully — salary, benefits, start date, and any conditions.'],
-                                ['icon'=>'fa-comments-o',  'title'=>'Negotiate if needed', 'desc'=>'It is perfectly acceptable to ask questions or negotiate reasonable terms professionally.'],
-                                ['icon'=>'fa-check-circle','title'=>'Respond promptly',    'desc'=>'Accept or decline within the timeframe given. The employer is waiting for your decision.'],
-                            ],
-                            'hired'       => [
-                                ['icon'=>'fa-handshake-o','title'=>'Onboarding details',   'desc'=>'Expect an email or call from HR with your start date, documents, and first-day instructions.'],
-                                ['icon'=>'fa-id-card-o',  'title'=>'Prepare your documents','desc'=>'Have your ID, tax forms, and any certifications ready ahead of your start date.'],
-                                ['icon'=>'fa-star-o',     'title'=>'Celebrate!',            'desc'=>'You earned it. Best of luck in your new role — this is just the beginning!'],
-                            ],
-                            'rejected'    => [
-                                ['icon'=>'fa-search',       'title'=>'Keep searching',      'desc'=>'There are many great opportunities on JobPortal. Browse today\'s listings and apply again.'],
-                                ['icon'=>'fa-pencil',       'title'=>'Refine your profile', 'desc'=>'Review your CV, improve your skills section, and make sure your profile stands out.'],
-                                ['icon'=>'fa-heart-o',      'title'=>'Stay positive',       'desc'=>'Rejections are part of the journey. Every application is valuable experience. Keep going!'],
-                            ],
-                            'withdrawn'   => [
-                                ['icon'=>'fa-search',    'title'=>'Browse more jobs',    'desc'=>'Explore thousands of opportunities on JobPortal that match your skills and goals.'],
-                                ['icon'=>'fa-star-o',    'title'=>'Update your profile', 'desc'=>'Refresh your CV and skills to make your next application even stronger.'],
-                                ['icon'=>'fa-thumbs-o-up','title'=>'You know your worth','desc'=>'Withdrawing shows self-awareness. Find a role that is the right fit for you.'],
-                            ],
-                        ];
                         $steps = $nextSteps[$status] ?? $nextSteps['submitted'];
                         foreach ($steps as $ns):
                         ?>

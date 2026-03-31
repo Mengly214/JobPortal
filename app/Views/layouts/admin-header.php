@@ -43,6 +43,9 @@ $unreadCount = (new ContactMessage())->countUnread();
 
           /* Content */
           .adm-body{margin-left:225px;margin-top:58px;padding:24px 26px;min-height:calc(100vh - 58px)}
+          /* Fix Bootstrap row bleed — rows inside adm-body need a container wrapper */
+          .adm-body .row{margin-left:-10px;margin-right:-10px}
+          .adm-body .row>[class*="col-"]{padding-left:10px;padding-right:10px}
 
           /* Page bar */
           .pg-bar{background:#fff;border-top:3px solid #29ca8e;padding:14px 20px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 10px rgba(0,0,0,.07);border-radius:0 0 4px 4px}

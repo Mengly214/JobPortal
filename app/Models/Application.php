@@ -169,4 +169,21 @@ class Application extends Model
         return true;
     }
 
+    /** Get all applications for admin, optionally filtered by status */
+    public function getAll(string $status = ''): array
+    {
+        $where = $status ? "WHERE a.status = '" . $this->conn->real_escape_string($status) . "'" : '';
+        return $this->conn->query("
+            SELECT a.*, j.title AS job_title, j.deadline AS application_deadline,
+                   u.email AS applicant_email, u.full_name AS applicant_name,
+                   ep.company_name, ep.logo AS company_logo
+            FROM applications a
+            JOIN jobs j       ON a.job_id = j.id
+            JOIN users u      ON a.applicant_id = u.id
+            LEFT JOIN employer_profiles ep ON j.employer_id = ep.user_id
+            $where
+            ORDER BY a.applied_at DESC
+        ")->fetch_all(MYSQLI_ASSOC);
+    }
+
 }

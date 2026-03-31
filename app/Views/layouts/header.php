@@ -260,28 +260,23 @@ $moreActive = array_key_exists($activePage ?? '', $moreItems);
                         <?php elseif ($_SESSION['role'] === 'employer'): ?>
                         <a href="<?php echo SITE_URL; ?>/employer/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
                         <a href="<?php echo SITE_URL; ?>/employer/jobs/create"><i class="fa fa-plus-circle"></i> Post a Job</a>
-                        
+                        <a href="<?php echo SITE_URL; ?>/employer/applications" style="display:flex;align-items:center;justify-content:space-between">
+                            <span><i class="fa fa-envelope"></i> Messages</span>
+                            <?php
+                            if (file_exists(BASE_PATH . '/app/Models/Message.php')) {
+                                require_once BASE_PATH . '/app/Models/Message.php';
+                                $msgModel       = new Message();
+                                $empUnread      = $msgModel->countUnread((int)$_SESSION['user_id'], 'employer');
+                                if ($empUnread > 0):
+                            ?>
+                            <span style="background:#e53935;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 7px;min-width:18px;text-align:center"><?php echo $empUnread > 99 ? '99+' : $empUnread; ?></span>
+                            <?php endif; } ?>
+                        </a>
                         <div class="divider"></div>
                         <a href="<?php echo SITE_URL; ?>/employer/profile"><i class="fa fa-user-circle"></i> My Profile</a>
                         <?php else: ?>
                         <a href="<?php echo SITE_URL; ?>/seeker/dashboard"><i class="fa fa-tachometer"></i> Dashboard</a>
                         <a href="<?php echo SITE_URL; ?>/seeker/applications"><i class="fa fa-file-text"></i> My Applications</a>
-                        <a href="<?php echo SITE_URL; ?>/seeker/report"><i class="fa fa-bar-chart"></i> My Report</a>
-                        <!-- SEEKER: add this link inside the seeker nav dropdown -->
-<a href="<?php echo SITE_URL; ?>/seeker/applications">
-    <i class="fa fa-envelope"></i> Messages
-    <?php
-    // Show unread badge
-    if (class_exists('Message') || file_exists(BASE_PATH . '/app/Models/Message.php')) {
-        @require_once BASE_PATH . '/app/Models/Message.php';
-        if (class_exists('Message')) {
-            $msgModel    = new Message();
-            $unreadCount = $msgModel->countUnread((int)$_SESSION['user_id'], 'job_seeker');
-            if ($unreadCount > 0):
-    ?>
-    <span style="display:inline-flex;align-items:center;justify-content:center;background:#e53935;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:4px;min-width:18px"><?php echo $unreadCount > 99 ? '99+' : $unreadCount; ?></span>
-    <?php   endif; }}  ?>
-</a>
                         <div class="divider"></div>
                         <a href="<?php echo SITE_URL; ?>/seeker/profile"><i class="fa fa-user-circle"></i> My Profile</a>
                         <?php endif; ?>

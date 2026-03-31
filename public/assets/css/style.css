@@ -699,9 +699,17 @@ https://templatemo.com/tm-516-known
       CONTACT             
   -----------------------------------------*/
 
-  #contact {
-    background: #3f51b5;
-  }
+ 
+#contact {
+ 
+  background: 
+    linear-gradient(135deg, rgba(10,22,40,0.6), rgba(13,48,96,0.6)),
+    url("https://images.unsplash.com/photo-1521791136064-7986c2920216") no-repeat center center;
+  background-size: cover;
+  color: #ccc;
+
+
+}
 
   #contact h2 {
     color: #ffffff;
@@ -714,7 +722,7 @@ https://templatemo.com/tm-516-known
   #contact h2 > small,
   #contact p,
   #contact a {
-    color: #f9f9f9;
+    color: #ccc;
   }
 
   #contact-form {
@@ -1052,10 +1060,8 @@ https://templatemo.com/tm-516-known
 
   .list { font-size: 16px; line-height: 1.6; }
   .list li { margin-bottom: 15px;  }
-<<<<<<< HEAD
 
   
-=======
     /* Dashboard Enhancements */
     .dash-card {
       background: #fff;
@@ -1114,4 +1120,3 @@ https://templatemo.com/tm-516-known
           background-color: #dc3545;
           color: white;
         }
->>>>>>> 31641f3ae7d94e458be00d9b01410f6a5f38d946

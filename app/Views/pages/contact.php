@@ -2,7 +2,7 @@
 
 <div class="jg-page-hero">
     <div class="container">
-        <h1>Contact Us</h1>
+        <h1 style="color: #ccc;">Contact Us</h1>
         <p>We'd love to hear from you. Send a message and we'll respond shortly.</p>
     </div>
 </div>

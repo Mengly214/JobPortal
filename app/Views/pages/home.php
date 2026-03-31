@@ -252,7 +252,7 @@
         <div class="row">
             <div class="col-md-8 col-sm-9 js-reveal" data-reveal-delay="0">
                 <span class="jg-label jg-label--light">Getting Started</span>
-                <h2>Don't Just Find. Be Found.</h2>
+                <h2 style="color: #ccc">Don't Just Find. Be Found.</h2>
                 <p>Put your CV in front of great employers and let recruiters contact you about opportunities you haven't even thought of yet.</p>
             </div>
             <div class="col-md-4 col-sm-3 jg-cta__action js-reveal" data-reveal-delay="150">
@@ -486,7 +486,7 @@
             <div class="col-md-6 col-sm-12 js-reveal" data-reveal-delay="0">
                 <span class="jg-label">Get In Touch</span>
                 <h2 class="jg-section__title">Contact Us</h2>
-                <p style="color:#666;margin-bottom:28px">Have a question or need help? We'd love to hear from you.</p>
+                <p style="color:#ccc;margin-bottom:28px">Have a question or need help? We'd love to hear from you.</p>
                 <form action="<?php echo SITE_URL; ?>/contact" method="post" class="jg-contact-form">
                     <div class="jg-form-group"><input type="text" name="name" placeholder="Your full name" required></div>
                     <div class="jg-form-group"><input type="email" name="email" placeholder="Your email address" required></div>
@@ -498,15 +498,15 @@
                 <div class="jg-contact__info">
                     <div class="jg-contact__info-item">
                         <div class="jg-contact__info-icon"><i class="fa fa-map-marker"></i></div>
-                        <div><strong>Address</strong><span>212 Barrington Court, New York, 10001</span></div>
+                        <div><strong>Address</strong><span style="color: #ccc;">212 Barrington Court, New York, 10001</span></div>
                     </div>
                     <div class="jg-contact__info-item">
                         <div class="jg-contact__info-icon"><i class="fa fa-envelope"></i></div>
-                        <div><strong>Email</strong><span><?php echo defined('SITE_EMAIL') ? SITE_EMAIL : 'hello@jobportal.com'; ?></span></div>
+                        <div><strong>Email</strong><span style="color: #ccc;"><?php echo defined('SITE_EMAIL') ? SITE_EMAIL : 'hello@jobportal.com'; ?></span></div>
                     </div>
                     <div class="jg-contact__info-item">
                         <div class="jg-contact__info-icon"><i class="fa fa-phone"></i></div>
-                        <div><strong>Phone</strong><span>+1 (555) 555-1234</span></div>
+                        <div><strong>Phone</strong><span style="color: #ccc;">+1 (555) 555-1234</span></div>
                     </div>
                 </div>
             </div>
@@ -781,8 +781,10 @@ html { scroll-behavior: smooth; }
 
 /* ─── STATS STRIP ────────────────────────────────────── */
 .jg-stats {
-    background: linear-gradient(90deg, #0a65cc 0%, #0d3060 100%);
-    padding: 48px 0;
+   background: 
+    linear-gradient(rgba(10,101,204,0.7), rgba(13,48,96,0.7)),
+    url("https://images.unsplash.com/photo-1551288049-bebda4e38f71") no-repeat center center;
+  background-size: cover;
 }
 .jg-stats__grid {
     display: flex; flex-wrap: wrap;
@@ -820,12 +822,14 @@ html { scroll-behavior: smooth; }
 
 /* ─── CTA BANNER ─────────────────────────────────────── */
 .jg-cta {
-    position:relative;
-    background: linear-gradient(135deg,rgba(10,22,40,.95),rgba(10,101,204,.92)),
-                url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1400&q=50&fit=crop') center/cover no-repeat;
-    padding:60px 0; overflow:hidden; color:#fff;
+    position: relative;
+    background: 
+        linear-gradient(135deg, rgba(10,22,40,0.65), rgba(10,101,204,0.55)),
+        url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1400&q=50&fit=crop') center/cover no-repeat;
+    padding: 60px 0;
+    overflow: hidden;
+    color: #fff;
 }
-.jg-cta__bg { position:absolute;inset:0;opacity:.05;background-image:repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%);background-size:20px 20px }
 .jg-cta .container { position:relative; }
 .jg-cta h2 { font-size:30px; font-weight:800; margin-bottom:12px; }
 .jg-cta p  { color:rgba(255,255,255,.82); font-size:15px; max-width:520px; margin-bottom:0; }
@@ -834,7 +838,8 @@ html { scroll-behavior: smooth; }
 /* ─── TESTIMONIALS ───────────────────────────────────── */
 .jg-testimonials {
     background: linear-gradient(135deg,rgba(10,22,40,.97),rgba(13,48,96,.96)),
-                url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1400&q=50&fit=crop') center/cover no-repeat;
+                url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d") no-repeat center center;
+  background-size: cover;
     padding:80px 0;
 }
 .jg-tst-grid  { display:flex; flex-wrap:wrap; margin:0 -14px; }
@@ -855,7 +860,8 @@ html { scroll-behavior: smooth; }
 .jg-tst-card2__text { font-size:14px; line-height:1.75; color:rgba(255,255,255,.82); margin:0; flex:1; font-style:italic; }
 
 /* ─── CONTACT ────────────────────────────────────────── */
-.jg-contact { padding:70px 0; background:#fff; }
+.jg-contact { padding:70px 0;  }
+.jg-contact {background: #042b1f;}
 .jg-contact__right { padding-top:40px; }
 .jg-contact-form .jg-form-group { margin-bottom:16px; }
 .jg-contact-form input,

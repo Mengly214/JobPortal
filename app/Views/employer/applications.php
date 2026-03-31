@@ -92,12 +92,15 @@
             'rejected'    => ['cls'=>'sp-red',    'label'=>'Rejected',    'icon'=>'fa-times-circle'],
             'withdrawn'   => ['cls'=>'sp-gray',   'label'=>'Withdrawn',   'icon'=>'fa-minus-circle'],
         ];
+        require_once BASE_PATH . '/app/Models/Message.php';
+        $msgModel = new Message();
         foreach ($applications as $app):
             $sm      = $statusMeta[$app['status']] ?? $statusMeta['submitted'];
             $initial = strtoupper(substr($app['applicant_name'] ?? $app['applicant_email'] ?? '?', 0, 1));
+            $unread  = $msgModel->countUnreadForApp((int)$app['id'], 'employer');
         ?>
 
-        <div class="ea-card" id="card-<?= $app['id'] ?>">
+        <div class="ea-card <?= $unread > 0 ? 'ea-card--has-msg' : '' ?>" id="card-<?= $app['id'] ?>">
 
             <!-- ── LEFT: applicant ───────────────────── -->
             <div class="ea-card__applicant">
@@ -130,6 +133,15 @@
                     <?php foreach (array_slice(array_filter(array_map('trim', explode(',', $app['skills']))), 0, 5) as $sk): ?>
                     <span class="ea-skill"><?= htmlspecialchars($sk) ?></span>
                     <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+
+                <!-- Unread message strip — only shown when there are unread messages -->
+                <?php if ($unread > 0): ?>
+                <div class="ea-msg-strip">
+                    <i class="fa fa-envelope"></i>
+                    <strong><?= $unread ?> unread message<?= $unread > 1 ? 's' : '' ?></strong>
+                    from this applicant
                 </div>
                 <?php endif; ?>
             </div>
@@ -166,9 +178,21 @@
                 <!-- Action buttons row -->
                 <div class="ea-action-row">
                     <a href="<?= SITE_URL ?>/employer/seeker/<?= $app['applicant_id'] ?>"
-                       class="ea-action-btn ea-action-btn--profile" title="View Profile">
+                       class="ea-action-btn ea-action-btn--profile" title="View Applicant Profile">
                         <i class="fa fa-user"></i> Profile
                     </a>
+
+                    <a href="<?= SITE_URL ?>/employer/messages/<?= $app['id'] ?>"
+                       class="ea-action-btn ea-action-btn--msg <?= $unread > 0 ? 'ea-action-btn--msg-unread' : '' ?>"
+                       title="<?= $unread > 0 ? $unread . ' unread message' . ($unread > 1 ? 's' : '') : 'Message Applicant' ?>">
+                        <i class="fa fa-envelope"></i>
+                        <?php if ($unread > 0): ?>
+                            <span class="ea-msg-badge"><?= $unread > 99 ? '99+' : $unread ?></span>
+                        <?php else: ?>
+                            Msg
+                        <?php endif; ?>
+                    </a>
+
                     <?php if (!empty($app['cv_file'])): ?>
                     <a href="<?= SITE_URL ?>/uploads/resumes/<?= htmlspecialchars($app['cv_file']) ?>"
                        download class="ea-action-btn ea-action-btn--cv" title="Download CV">
@@ -245,6 +269,8 @@
 /* ── Application card ──────────────────────────────────── */
 .ea-card{background:#fff;border:1.5px solid #e8edf5;border-radius:16px;padding:20px 22px;display:grid;grid-template-columns:220px 1fr 200px;gap:20px;align-items:start;transition:.2s;box-shadow:0 2px 10px rgba(10,50,120,.04)}
 .ea-card:hover{border-color:#b8d0f5;box-shadow:0 6px 24px rgba(10,101,204,.09)}
+/* Card with unread messages gets a red left accent */
+.ea-card--has-msg{border-left:4px solid #e53935}
 
 /* applicant column */
 .ea-card__applicant{display:flex;align-items:flex-start;gap:12px}
@@ -264,6 +290,11 @@
 .ea-card__cover{font-size:13px;color:#64748b;line-height:1.6;border-left:3px solid #e0e6f0;padding-left:10px}
 .ea-card__skills{display:flex;flex-wrap:wrap;gap:4px}
 .ea-skill{background:#f0f5ff;color:#0a65cc;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+
+/* Unread message strip inside card body */
+.ea-msg-strip{display:flex;align-items:center;gap:7px;background:#fff5f5;border:1px solid #fca5a5;border-radius:8px;padding:7px 12px;font-size:12px;color:#e53935;font-weight:600;animation:pulseBorder 2s ease-in-out infinite}
+.ea-msg-strip i{font-size:13px;flex-shrink:0}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.2)}50%{box-shadow:0 0 0 4px rgba(229,57,53,0)}}
 
 /* actions column */
 .ea-card__actions{display:flex;flex-direction:column;align-items:stretch;gap:10px}
@@ -287,10 +318,21 @@
 .ea-status-select.loading{opacity:.6;pointer-events:none}
 
 /* action buttons row */
-.ea-action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ea-action-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 0;border-radius:9px;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:.2s;white-space:nowrap}
+.ea-action-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.ea-action-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 0;border-radius:9px;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:.2s;white-space:nowrap;position:relative}
 .ea-action-btn--profile{background:#eef3fd;color:#0a65cc;border:1.5px solid #c8daf9}
 .ea-action-btn--profile:hover{background:#0a65cc;color:#fff;border-color:#0a65cc}
+/* Message button — normal state */
+.ea-action-btn--msg{background:#f0ebff;color:#6c3fc5;border:1.5px solid #d4c8f8}
+.ea-action-btn--msg:hover{background:#6c3fc5;color:#fff;border-color:#6c3fc5}
+/* Message button — unread state */
+.ea-action-btn--msg-unread{background:#fff0f0;color:#e53935;border:1.5px solid #fca5a5;animation:pulseMsg 2s ease-in-out infinite}
+.ea-action-btn--msg-unread:hover{background:#e53935;color:#fff;border-color:#e53935;animation:none}
+@keyframes pulseMsg{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.35)}50%{box-shadow:0 0 0 5px rgba(229,57,53,0)}}
+/* Badge inside the message button */
+.ea-msg-badge{display:inline-flex;align-items:center;justify-content:center;background:#e53935;color:#fff;border-radius:20px;font-size:10px;font-weight:800;min-width:18px;padding:0 5px;height:16px;line-height:1}
+.ea-action-btn--msg-unread .ea-msg-badge{background:#fff;color:#e53935}
+
 .ea-action-btn--cv{background:#e8f5e9;color:#2e7d32;border:1.5px solid #b7e5c4}
 .ea-action-btn--cv:hover{background:#2e7d32;color:#fff;border-color:#2e7d32}
 .ea-action-btn--nocv{background:#f8fafc;color:#b0bac8;border:1.5px solid #e8edf5;cursor:default;font-size:11px}
@@ -301,7 +343,7 @@
 @media(max-width:640px) {
     .ea-card{grid-template-columns:1fr;gap:14px}
     .ea-card__actions{flex-direction:row;flex-wrap:wrap;align-items:center}
-    .ea-action-row{flex:1;grid-template-columns:1fr 1fr}
+    .ea-action-row{flex:1;grid-template-columns:1fr 1fr 1fr}
     .ea-hero__title{font-size:26px}
     .ea-toolbar{flex-direction:column;align-items:stretch}
     .ea-toolbar__filters{flex-direction:column}
@@ -313,12 +355,11 @@
      SCRIPTS — AJAX status update + toast
 ====================================================== -->
 <script>
-/* ── Status metadata ──────────────────────────────────── */
 var STATUS_META = {
     submitted:   { cls: 'sp-teal',   label: 'Received',    icon: 'fa-paper-plane',  toast: 'info',    msg: 'Marked as Received' },
     reviewing:   { cls: 'sp-blue',   label: 'In Review',   icon: 'fa-search',       toast: 'info',    msg: 'Moved to In Review' },
     shortlisted: { cls: 'sp-purple', label: 'Shortlisted', icon: 'fa-star',         toast: 'info',    msg: '⭐ Candidate shortlisted!' },
-    interview:   { cls: 'sp-orange', label: 'Interview',   icon: 'fa-calendar',     toast: 'info',    msg: '📅 Interview scheduled — check your email.' },
+    interview:   { cls: 'sp-orange', label: 'Interview',   icon: 'fa-calendar',     toast: 'info',    msg: '📅 Interview scheduled.' },
     offered:     { cls: 'sp-indigo', label: 'Offered',     icon: 'fa-envelope',     toast: 'info',    msg: '📨 Offer sent to candidate.' },
     hired:       { cls: 'sp-green',  label: 'Hired',       icon: 'fa-trophy',       toast: 'success', msg: '🎉 Candidate marked as Hired!' },
     rejected:    { cls: 'sp-red',    label: 'Rejected',    icon: 'fa-times-circle', toast: 'error',   msg: 'Candidate marked as Not Selected.' },
@@ -327,7 +368,6 @@ var STATUS_META = {
 
 var ALL_PILL_CLS = Object.values(STATUS_META).map(function(m){ return m.cls; });
 
-/* ── AJAX status update ───────────────────────────────── */
 function updateStatus(sel) {
     var appId  = sel.dataset.appId;
     var jobId  = sel.dataset.jobId;
@@ -342,14 +382,9 @@ function updateStatus(sel) {
     fd.append('status', status);
     fd.append('job_id', jobId);
 
-    fetch('<?= SITE_URL ?>/employer/applications/updateStatus', {
-        method: 'POST',
-        body: fd
-    })
+    fetch('<?= SITE_URL ?>/employer/applications/updateStatus', { method: 'POST', body: fd })
     .then(function(r) {
-        /* Controller redirects — a 200 on the redirected URL means success */
         if (r.ok) {
-            /* Update pill */
             var pill  = document.getElementById('pill-' + appId);
             var label = document.getElementById('pill-label-' + appId);
             if (pill) {
@@ -359,41 +394,31 @@ function updateStatus(sel) {
             }
             if (label) label.textContent = meta.label;
 
-            /* Flash card */
             var card = document.getElementById('card-' + appId);
             if (card) {
                 card.style.transition = 'background .25s';
                 card.style.background = status === 'hired' ? '#f0fdf4'
-                                      : status === 'rejected' ? '#fff5f5'
-                                      : '#f0f6ff';
+                                      : status === 'rejected' ? '#fff5f5' : '#f0f6ff';
                 setTimeout(function(){ card.style.background = ''; }, 1200);
             }
-
             showToast(meta.toast, meta.msg);
         } else {
             showToast('error', 'Update failed. Please try again.');
         }
     })
-    .catch(function() {
-        showToast('error', 'Connection error. Please try again.');
-    })
-    .finally(function() {
-        sel.classList.remove('loading');
-    });
+    .catch(function() { showToast('error', 'Connection error. Please try again.'); })
+    .finally(function() { sel.classList.remove('loading'); });
 }
 
-/* ── Toast ────────────────────────────────────────────── */
 var _toastTimer = null;
 function showToast(type, msg) {
     var t = document.getElementById('ea-toast');
     if (!t) return;
     clearTimeout(_toastTimer);
-
     t.className = 'ea-toast ea-toast--' + type + ' show';
     t.innerHTML = '<i class="fa ' + (type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle') + '"></i>'
                 + '<span>' + msg + '</span>'
                 + '<button class="ea-toast__close" onclick="hideToast()">&times;</button>';
-
     _toastTimer = setTimeout(hideToast, 4500);
 }
 function hideToast() {
