@@ -35,12 +35,12 @@ class Employer_JobsController extends Controller {
         ")->fetch_all(MYSQLI_ASSOC);
 
         $this->view('employer/jobs', [
-            'pageTitle' => 'My Jobs',
+            'pageTitle'  => 'My Jobs',
             'activePage' => '',
-            'jobs'   => $jobs,
-            'search' => $search,
-            'status' => $status,
-            'sort'   => $sort,
+            'jobs'       => $jobs,
+            'search'     => $search,
+            'status'     => $status,
+            'sort'       => $sort,
         ]);
     }
 
@@ -86,7 +86,6 @@ class Employer_JobsController extends Controller {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$error, $success, $old] = $this->saveJob($conn, $id);
-            // Refresh job data after update
             if (!$error) {
                 $job = $conn->query("SELECT * FROM jobs WHERE id=$id LIMIT 1")->fetch_assoc();
             }
@@ -107,8 +106,7 @@ class Employer_JobsController extends Controller {
     /* ── TOGGLE STATUS ────────────────────────────────── */
     public function toggle(int $id): void {
         $conn = $GLOBALS['conn'];
-        // Verify ownership first
-        $job = $conn->query("SELECT status FROM jobs WHERE id=$id AND employer_id={$this->employerId} LIMIT 1")->fetch_assoc();
+        $job  = $conn->query("SELECT status FROM jobs WHERE id=$id AND employer_id={$this->employerId} LIMIT 1")->fetch_assoc();
         if ($job) {
             $newStatus = $job['status'] === 'active' ? 'paused' : 'active';
             $conn->query("UPDATE jobs SET status='$newStatus' WHERE id=$id AND employer_id={$this->employerId}");
@@ -120,8 +118,7 @@ class Employer_JobsController extends Controller {
     /* ── DELETE JOB ───────────────────────────────────── */
     public function delete(int $id): void {
         $conn = $GLOBALS['conn'];
-        // Verify ownership, then delete (applications cascade if FK set, else delete manually)
-        $job = $conn->query("SELECT id FROM jobs WHERE id=$id AND employer_id={$this->employerId} LIMIT 1")->fetch_assoc();
+        $job  = $conn->query("SELECT id FROM jobs WHERE id=$id AND employer_id={$this->employerId} LIMIT 1")->fetch_assoc();
         if ($job) {
             $conn->query("DELETE FROM applications WHERE job_id=$id");
             $conn->query("DELETE FROM jobs WHERE id=$id AND employer_id={$this->employerId}");
@@ -130,8 +127,49 @@ class Employer_JobsController extends Controller {
         exit;
     }
 
-    /* ── PRIVATE: shared save logic ──────────────────── */
-    private function saveJob($conn, ?int $id): array {
+    /* ═══════════════════════════════════════════════════
+       PRIVATE HELPERS
+    ═══════════════════════════════════════════════════ */
+
+    /**
+     * Generate a URL-safe slug from a title and guarantee it is
+     * unique in the jobs table.  Pass $excludeId when editing so
+     * the current row does not conflict with itself.
+     */
+    private function makeSlug(mysqli $conn, string $title, ?int $excludeId = null): string {
+        // 1. Basic slug conversion
+        $slug = mb_strtolower(trim($title), 'UTF-8');
+        $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);  // keep only a-z 0-9 space hyphen
+        $slug = preg_replace('/[\s-]+/', '-', $slug);         // collapse spaces/hyphens
+        $slug = trim($slug, '-');                             // strip leading/trailing hyphens
+
+        // 2. Hard fallback if title was entirely non-latin characters
+        if ($slug === '') {
+            $slug = 'job';
+        }
+
+        // 3. Enforce max length (most slug columns are varchar 255)
+        $slug = substr($slug, 0, 200);
+
+        // 4. Ensure uniqueness — append -2, -3 … until free
+        $base   = $slug;
+        $suffix = 1;
+        while (true) {
+            $safe   = $conn->real_escape_string($slug);
+            $excl   = $excludeId ? "AND id != $excludeId" : '';
+            $result = $conn->query("SELECT id FROM jobs WHERE slug = '$safe' $excl LIMIT 1");
+            if (!$result || $result->num_rows === 0) {
+                break;          // slug is free
+            }
+            $suffix++;
+            $slug = $base . '-' . $suffix;
+        }
+
+        return $slug;
+    }
+
+    /* ── Shared INSERT / UPDATE logic ─────────────────── */
+    private function saveJob(mysqli $conn, ?int $id): array {
         $title       = trim($_POST['title']       ?? '');
         $description = trim($_POST['description'] ?? '');
         $error = $success = '';
@@ -141,30 +179,36 @@ class Employer_JobsController extends Controller {
             return ['Job title and description are required.', '', $old];
         }
 
-        $category_id       = (int)($_POST['category_id']       ?? 0) ?: 'NULL';
-        $job_type          = $conn->real_escape_string(trim($_POST['job_type']          ?? 'full_time'));
-        $experience_level  = $conn->real_escape_string(trim($_POST['experience_level']  ?? ''));
-        $location_city     = $conn->real_escape_string(trim($_POST['location_city']     ?? ''));
-        $location_country  = $conn->real_escape_string(trim($_POST['location_country']  ?? ''));
-        $is_remote         = isset($_POST['is_remote']) ? 1 : 0;
-        $salary_min        = (int)($_POST['salary_min'] ?? 0);
-        $salary_max        = (int)($_POST['salary_max'] ?? 0);
-        $salary_currency   = $conn->real_escape_string(trim($_POST['salary_currency']   ?? 'USD'));
-        $deadline          = $conn->real_escape_string(trim($_POST['deadline'] ?? ''));
-        $deadline_val      = $deadline ? "'$deadline'" : 'NULL';
-        $status            = $conn->real_escape_string(trim($_POST['status'] ?? 'active'));
-        $is_featured       = isset($_POST['is_featured']) ? 1 : 0;
-        $requirements      = $conn->real_escape_string(trim($_POST['requirements']      ?? ''));
-        $benefits          = $conn->real_escape_string(trim($_POST['benefits']          ?? ''));
-        $title_esc         = $conn->real_escape_string($title);
-        $desc_esc          = $conn->real_escape_string($description);
-        $cat_val           = is_int($category_id) ? $category_id : 'NULL';
+        // ── Generate unique slug ───────────────────────
+        $slug = $this->makeSlug($conn, $title, $id);
+        $slug_esc = $conn->real_escape_string($slug);
 
-        // Image upload
+        // ── Sanitise all other fields ──────────────────
+        $category_id      = (int)($_POST['category_id']      ?? 0);
+        $cat_val          = $category_id > 0 ? $category_id : 'NULL';
+        $job_type         = $conn->real_escape_string(trim($_POST['job_type']         ?? 'full_time'));
+        $experience_level = $conn->real_escape_string(trim($_POST['experience_level'] ?? ''));
+        $location_city    = $conn->real_escape_string(trim($_POST['location_city']    ?? ''));
+        $location_country = $conn->real_escape_string(trim($_POST['location_country'] ?? ''));
+        $is_remote        = isset($_POST['is_remote']) ? 1 : 0;
+        $salary_min       = (int)($_POST['salary_min'] ?? 0);
+        $salary_max       = (int)($_POST['salary_max'] ?? 0);
+        $salary_currency  = $conn->real_escape_string(trim($_POST['salary_currency']  ?? 'USD'));
+        $deadline         = $conn->real_escape_string(trim($_POST['deadline']         ?? ''));
+        $deadline_val     = $deadline ? "'$deadline'" : 'NULL';
+        $status           = $conn->real_escape_string(trim($_POST['status']           ?? 'active'));
+        $is_featured      = isset($_POST['is_featured']) ? 1 : 0;
+        $requirements     = $conn->real_escape_string(trim($_POST['requirements']     ?? ''));
+        $benefits         = $conn->real_escape_string(trim($_POST['benefits']         ?? ''));
+        $title_esc        = $conn->real_escape_string($title);
+        $desc_esc         = $conn->real_escape_string($description);
+
+        // ── Image upload ───────────────────────────────
         $job_image = '';
         if (!empty($_FILES['job_image']['name'])) {
             $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            if (in_array($_FILES['job_image']['type'], $allowed) && $_FILES['job_image']['size'] <= 3 * 1024 * 1024) {
+            if (in_array($_FILES['job_image']['type'], $allowed)
+                && $_FILES['job_image']['size'] <= 3 * 1024 * 1024) {
                 $ext       = pathinfo($_FILES['job_image']['name'], PATHINFO_EXTENSION);
                 $job_image = 'job_' . time() . '_' . rand(100, 999) . '.' . $ext;
                 $dir       = BASE_PATH . '/public/uploads/jobs/';
@@ -174,39 +218,56 @@ class Employer_JobsController extends Controller {
         }
 
         if ($id) {
-            // UPDATE
-            $imgClause = $job_image ? ", job_image='$job_image'" : '';
+            // ── UPDATE ────────────────────────────────
+            // Only update slug if title changed (avoids pointless churn)
+            $imgClause  = $job_image ? ", job_image='$job_image'" : '';
             $conn->query("
                 UPDATE jobs SET
-                    title='$title_esc', description='$desc_esc',
-                    category_id=$cat_val, job_type='$job_type',
-                    experience_level='$experience_level',
-                    location_city='$location_city', location_country='$location_country',
-                    is_remote=$is_remote, salary_min=$salary_min, salary_max=$salary_max,
-                    salary_currency='$salary_currency',
-                    deadline=$deadline_val,
-                    status='$status', is_featured=$is_featured,
-                    requirements='$requirements', benefits='$benefits'
+                    title            = '$title_esc',
+                    slug             = '$slug_esc',
+                    description      = '$desc_esc',
+                    category_id      = $cat_val,
+                    job_type         = '$job_type',
+                    experience_level = '$experience_level',
+                    location_city    = '$location_city',
+                    location_country = '$location_country',
+                    is_remote        = $is_remote,
+                    salary_min       = $salary_min,
+                    salary_max       = $salary_max,
+                    salary_currency  = '$salary_currency',
+                    deadline         = $deadline_val,
+                    status           = '$status',
+                    is_featured      = $is_featured,
+                    requirements     = '$requirements',
+                    benefits         = '$benefits'
                     $imgClause
-                WHERE id=$id AND employer_id={$this->employerId}
+                WHERE id = $id AND employer_id = {$this->employerId}
             ");
             $success = 'Job updated successfully.';
-            $old = [];
+            $old     = [];
+
         } else {
-            // INSERT
+            // ── INSERT ────────────────────────────────
             $img_val = $job_image ? "'$job_image'" : 'NULL';
             $conn->query("
-                INSERT INTO jobs (employer_id, title, description, category_id, job_type,
-                    experience_level, location_city, location_country, is_remote,
-                    salary_min, salary_max, salary_currency, deadline,
-                    status, is_featured, requirements, benefits, job_image, created_at)
-                VALUES ({$this->employerId}, '$title_esc', '$desc_esc', $cat_val, '$job_type',
-                    '$experience_level', '$location_city', '$location_country', $is_remote,
-                    $salary_min, $salary_max, '$salary_currency', $deadline_val,
-                    '$status', $is_featured, '$requirements', '$benefits', $img_val, NOW())
+                INSERT INTO jobs (
+                    employer_id, title, slug, description,
+                    category_id, job_type, experience_level,
+                    location_city, location_country, is_remote,
+                    salary_min, salary_max, salary_currency,
+                    deadline, status, is_featured,
+                    requirements, benefits, job_image, created_at
+                ) VALUES (
+                    {$this->employerId}, '$title_esc', '$slug_esc', '$desc_esc',
+                    $cat_val, '$job_type', '$experience_level',
+                    '$location_city', '$location_country', $is_remote,
+                    $salary_min, $salary_max, '$salary_currency',
+                    $deadline_val, '$status', $is_featured,
+                    '$requirements', '$benefits', $img_val, NOW()
+                )
             ");
             $success = 'Job posted successfully!';
-            $old = [];
+            $old     = [];
         }
 
         return [$error, $success, $old];

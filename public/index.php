@@ -76,6 +76,7 @@ $router->get('/admin/applications',           'Admin/ApplicationAdminController'
 $router->post('/admin/applications/update',   'Admin/ApplicationAdminController', 'update');
 $router->get('/admin/messages',               'Admin/MessageController',      'index');
 $router->any('/admin/settings',               'Admin/SettingsController',     'index');
+$router->any('/admin/jobs/edit/:id', 'Admin/JobAdminController', 'edit');
 
 // Employer Dashboard & Profile
 $router->get('/employer/dashboard', 'Employer/DashboardController', 'index');
@@ -118,6 +119,8 @@ $router->get('/seeker/report', 'Seeker/ReportController', 'index');
 
 $router->get('/api/messages/:id',  'MessagesApiController', 'poll');
 $router->post('/api/messages/:id', 'MessagesApiController', 'send');
+
+
 
 $router->dispatch();
 

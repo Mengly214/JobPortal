@@ -19,8 +19,86 @@ class Admin_JobAdminController extends Controller {
         ]);
     }
 
-    public function create(): void {
+    public function edit(int $id): void {
         requireRole('admin');
+        $model      = new Job();
+        $categories = $model->getCategories();
+        $job        = $model->find($id);
+        $error      = '';
+
+        if (!$job) { redirect('admin/jobs'); }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title    = clean($_POST['title'] ?? '');
+            $desc     = clean($_POST['description'] ?? '');
+            $city     = clean($_POST['location_city'] ?? '');
+            $job_type = clean($_POST['job_type'] ?? '');
+
+            if (!$title || !$desc || !$city || !$job_type) {
+                $error = 'Please fill in all required fields.';
+            } else {
+                $job_image = $job['job_image'] ?? '';
+                if (!empty($_FILES['job_image']['name'])) {
+                    $allowed   = ['image/jpeg','image/png','image/gif','image/webp'];
+                    $file_type = $_FILES['job_image']['type'];
+                    if (!in_array($file_type, $allowed)) {
+                        $error = 'Invalid image type.';
+                    } elseif ($_FILES['job_image']['size'] > 2 * 1024 * 1024) {
+                        $error = 'Image too large. Max 2MB.';
+                    } else {
+                        $ext       = pathinfo($_FILES['job_image']['name'], PATHINFO_EXTENSION);
+                        $new_img   = 'job_' . time() . '_' . rand(100,999) . '.' . $ext;
+                        $dest      = BASE_PATH . '/public/uploads/jobs/' . $new_img;
+                        if (!is_dir(dirname($dest))) mkdir(dirname($dest), 0755, true);
+                        if (move_uploaded_file($_FILES['job_image']['tmp_name'], $dest)) {
+                            if ($job_image && file_exists(BASE_PATH . '/public/uploads/jobs/' . $job_image))
+                                @unlink(BASE_PATH . '/public/uploads/jobs/' . $job_image);
+                            $job_image = $new_img;
+                        } else { $error = 'Failed to upload image.'; }
+                    }
+                }
+
+                if (!$error) {
+                    $conn     = $GLOBALS['conn'];
+                    $deadline = clean($_POST['application_deadline'] ?? '');
+                    $dlSql    = $deadline ? "'" . $conn->real_escape_string($deadline) . "'" : 'NULL';
+                    $conn->query("
+                        UPDATE jobs SET
+                            title               = '" . $conn->real_escape_string($title) . "',
+                            description         = '" . $conn->real_escape_string($desc) . "',
+                            requirements        = '" . $conn->real_escape_string(clean($_POST['requirements'] ?? '')) . "',
+                            benefits            = '" . $conn->real_escape_string(clean($_POST['benefits'] ?? '')) . "',
+                            job_type            = '" . $conn->real_escape_string($job_type) . "',
+                            work_mode           = '" . $conn->real_escape_string(clean($_POST['work_mode'] ?? 'on-site')) . "',
+                            experience_level    = '" . $conn->real_escape_string(clean($_POST['experience_level'] ?? 'mid')) . "',
+                            salary_min          = " . (int)($_POST['salary_min'] ?? 0) . ",
+                            salary_max          = " . (int)($_POST['salary_max'] ?? 0) . ",
+                            salary_currency     = '" . $conn->real_escape_string(clean($_POST['salary_currency'] ?? 'USD')) . "',
+                            location_city       = '" . $conn->real_escape_string($city) . "',
+                            location_country    = '" . $conn->real_escape_string(clean($_POST['location_country'] ?? '')) . "',
+                            deadline            = $dlSql,
+                            status              = '" . $conn->real_escape_string(clean($_POST['status'] ?? 'draft')) . "',
+                            is_featured         = " . (isset($_POST['is_featured']) ? 1 : 0) . ",
+                            category_id         = " . (int)($_POST['category_id'] ?? 0) . ",
+                            employer_id         = " . (int)($_POST['employer_id'] ?? $job['employer_id']) . ",
+                            job_image           = '" . $conn->real_escape_string($job_image) . "'
+                        WHERE id = $id
+                    ");
+                    redirect('admin/jobs?updated=1');
+                }
+            }
+        }
+
+        $this->view('admin/job-edit', [
+            'adminTitle' => 'Edit Job — ' . ($job['title'] ?? ''),
+            'adminPage'  => 'jobs',
+            'categories' => $categories,
+            'job'        => $job,
+            'error'      => $error,
+        ]);
+    }
+
+    public function create(): void {
         $model      = new Job();
         $categories = $model->getCategories();
         $error      = '';

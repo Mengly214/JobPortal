@@ -5,6 +5,10 @@
      <a href="<?php echo SITE_URL; ?>/admin/jobs/create" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Add Job</a>
 </div>
 
+<?php if (isset($_GET['updated'])): ?>
+<div class="alert alert-success"><i class="fa fa-check-circle"></i> Job updated successfully.</div>
+<?php endif; ?>
+
 <div class="adm-card" style="padding:15px 18px;margin-bottom:20px;border-top:none;border-left:4px solid #29ca8e;border-radius:0 4px 4px 0">
      <form method="get" action="<?php echo SITE_URL; ?>/admin/jobs" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <input type="text" name="search" class="form-control" style="width:220px" placeholder="Search title..." value="<?php echo htmlspecialchars($search); ?>">
@@ -44,6 +48,9 @@
                <td><small><?php echo $j['views']; ?></small></td>
                <td><small><?php echo date('d M Y', strtotime($j['created_at'])); ?></small></td>
                <td>
+                    <a href="<?php echo SITE_URL; ?>/admin/jobs/edit/<?php echo $j['id']; ?>" class="btn btn-xs btn-primary" title="Edit job">
+                         <i class="fa fa-pencil"></i> Edit
+                    </a>
                     <a href="<?php echo SITE_URL; ?>/admin/jobs?toggle=<?php echo $j['id']; ?>" class="btn btn-xs <?php echo $j['status'] === 'active' ? 'btn-warning' : 'btn-success'; ?>"
                        onclick="return confirm('Toggle status?')"><?php echo $j['status'] === 'active' ? 'Pause' : 'Activate'; ?></a>
                     <a href="<?php echo SITE_URL; ?>/admin/jobs?delete=<?php echo $j['id']; ?>" class="btn btn-xs btn-danger"

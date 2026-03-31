@@ -125,15 +125,15 @@ $unreadCount = (new ContactMessage())->countUnread();
           <li class="<?php echo ($adminPage??'')==='jobs'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/jobs"><i class="fa fa-briefcase"></i> All Jobs</a>
           </li>
-          <li class="<?php echo ($adminPage??'')==='import-jobs'?'active':''; ?>">
+          <!-- <li class="<?php echo ($adminPage??'')==='import-jobs'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/import-jobs"><i class="fa fa-cloud-download"></i> Import Jobs</a>
-          </li>
+          </li> -->
           <li class="<?php echo ($adminPage??'')==='applications'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/applications"><i class="fa fa-file-text"></i> Applications</a>
           </li>
-          <li class="<?php echo ($adminPage??'')==='categories'?'active':''; ?>">
+          <!-- <li class="<?php echo ($adminPage??'')==='categories'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/categories"><i class="fa fa-tags"></i> Categories</a>
-          </li>
+          </li> -->
 
           <div class="sh">Users</div>
           <li class="<?php echo ($adminPage??'')==='users'?'active':''; ?>">
@@ -159,12 +159,12 @@ $unreadCount = (new ContactMessage())->countUnread();
           </li>
 
           <div class="sh">Content</div>
-          <li class="<?php echo ($adminPage??'')==='blog'?'active':''; ?>">
+          <!-- <li class="<?php echo ($adminPage??'')==='blog'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/blog"><i class="fa fa-newspaper-o"></i> Blog Posts</a>
           </li>
           <li class="<?php echo ($adminPage??'')==='testimonials'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/testimonials"><i class="fa fa-star"></i> Testimonials</a>
-          </li>
+          </li> -->
           <li class="<?php echo ($adminPage??'')==='messages'?'active':''; ?>">
                <a href="<?php echo SITE_URL; ?>/admin/messages">
                     <i class="fa fa-envelope"></i> Messages

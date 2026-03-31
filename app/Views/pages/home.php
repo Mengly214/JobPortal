@@ -830,6 +830,7 @@ html { scroll-behavior: smooth; }
     overflow: hidden;
     color: #fff;
 }
+.jg-cta__bg { position:absolute;inset:0;opacity:.05;background-image:repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%);background-size:20px 20px }
 .jg-cta .container { position:relative; }
 .jg-cta h2 { font-size:30px; font-weight:800; margin-bottom:12px; }
 .jg-cta p  { color:rgba(255,255,255,.82); font-size:15px; max-width:520px; margin-bottom:0; }
